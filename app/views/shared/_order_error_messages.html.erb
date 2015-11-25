@@ -1,0 +1,17 @@
+<% if has_errors %>
+    <div id="error_explanation">
+      <div class="alert alert-danger">
+        There are detected errors:
+      </div>
+      <ul>
+        <% @order_releases.each do |order_release| %>
+            <li>Order: <%= order_release.purchase_order_number %></li>
+            <ul>
+              <% order_release.errors.full_messages.each do |msg| %>
+                  <li><%= msg %></li>
+              <% end %>
+            </ul>
+        <% end %>
+      </ul>
+    </div>
+<% end %>

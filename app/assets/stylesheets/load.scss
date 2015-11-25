@@ -1,0 +1,30 @@
+// Place all the styles related to the load controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: http://sass-lang.com/
+
+.available_order_table, .planning_orders_table {
+  word-wrap: break-word;
+  text-align: center;
+  font-size: 10px;
+  td th {
+    text-align: center;
+  }
+  tbody {
+    tr {
+      height: 30px; /* or whatever height you need to make them all consistent */
+    }
+  }
+}
+
+.dataTables_paginate, .dataTables_info, .dataTables_length {
+  font-size: 10px;
+
+}
+
+.dataTables_paginate {
+  text-align: center;
+}
+
+.load_planning{
+  font-size: 12px;
+}

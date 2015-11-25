@@ -1,0 +1,117 @@
+<% provide(:title, 'Load Planning') %>
+<div class="container-fluid load_planning">
+  <div class="row">
+    <div class="col-sm-6">
+      <label> Delivery Date</label>
+
+      <div class="order-value">
+        <input id="delivery_date_input" type="text" class="datepicker" value="<%= @load.delivery_date.strftime("%m/%d/%Y") %>">
+      </div>
+    </div>
+    <div class="col-sm-6">
+      <label>Truck</label>
+
+      <div class="order-value"><%= collection_select(:load, :truck, @trucks, 'id', 'name') %></div>
+    </div>
+  </div>
+
+  <div class="row top-buffer-small">
+    <div class="col-sm-6">
+      <label> Delivery Shift</label>
+
+      <div class="order-value"><%= select(:load, :delivery_shift, Load.delivery_shifts.keys) %></div>
+    </div>
+    <div class="col-sm-6">
+      <label>Truck Load</label>
+
+      <div class="order-value">
+        <label id="truck_volume"><%= '%.2f' % @load.delivering_total_volume %> </label> / 1400
+      </div>
+    </div>
+  </div>
+  <div class="row top-buffer-small">
+    <div class="col-sm-6">
+      <label>Load Status</label>
+
+      <div id="load_status_value" class="order-value"><%= @load.status.humanize %></div>
+    </div>
+  </div>
+  <div class="row top-buffer">
+    <div class="col-sm-6">
+      <h5>Available Orders</h5>
+      <hr>
+    </div>
+    <div class="col-sm-6">
+      <h5>Planning Orders</h5>
+      <hr>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-6">
+      <div class="dt-buttons">
+        <button id="split_av_order_button" class="btn-link toolbar-button" tabindex="0">Split Order</button>
+        <button id="submit_orders_button" class="btn-link toolbar-button" tabindex="0">Submit Orders</button>
+      </div>
+      <hr>
+      <table class='available_order_table table table-striped table-condensed table-bordered table-hover display' id="available_orders">
+        <thead>
+        <tr>
+          <th><input type="checkbox" id="av_orders_checkbox"/></th>
+          <th>Order №</th>
+          <th>Delivery Date</th>
+          <th>Delivery Shift</th>
+          <th>Type</th>
+          <th>Volume</th>
+          <th>Quantity</th>
+          <th>Origin Address</th>
+          <th>Destination Address</th>
+        </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <div class="col-sm-6">
+      <div class="dt-buttons">
+        <button id="return_orders_button" class="btn-link toolbar-button" tabindex="0">Return Orders</button>
+        <button id="split_plan_order_button" class="btn-link toolbar-button" tabindex="0">Split Order</button>
+        <button id="complete_load_button" class="btn-link toolbar-button" tabindex="0">Complete Load</button>
+      </div>
+      <hr>
+      <table class='planning_orders_table table table-striped table-condensed table-bordered table-hover display' id="planning_orders">
+        <thead>
+        <tr>
+          <th><input type="checkbox" id="plan_orders_checkbox"/></th>
+          <th>Order №</th>
+          <th>Delivery Date</th>
+          <th>Delivery Shift</th>
+          <th>Type</th>
+          <th>Volume</th>
+          <th>Quantity</th>
+          <th>Origin Address</th>
+          <th>Destination Address</th>
+        </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="load_planning" id="split_order_dialog" title="Split Order">
+  <p class="validateTips">All form fields are required.</p>
+
+  <form>
+    <fieldset>
+      <label for="handling_unit_quantity">Quantity:</label>
+
+      <div class="order-value">
+        <input type="number" name="handling_unit_quantity" id="handling_unit_quantity" class="text ui-widget-content ui-corner-all">
+      </div>
+      <label for="volume">Volume:</label>
+
+      <div class="order-value">
+        <input type="number" name="volume" id="volume" class="text ui-widget-content ui-corner-all">
+      </div>
+    </fieldset>
+  </form>
+</div>

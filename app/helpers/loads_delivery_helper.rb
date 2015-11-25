@@ -1,0 +1,2 @@
+module LoadsDeliveryHelper
+end

@@ -1,0 +1,15 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  delivery_date: 2015-11-20
+  delivery_shift: 1
+  status: 1
+  order_release_id: 
+  truck_id: 
+
+two:
+  delivery_date: 2015-11-20
+  delivery_shift: 1
+  status: 1
+  order_release_id: 
+  truck_id: 

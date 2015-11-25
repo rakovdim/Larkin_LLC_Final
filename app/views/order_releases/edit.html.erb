@@ -1,0 +1,119 @@
+<% provide(:title, "Order Release: "+@order_release.purchase_order_number) %>
+<div class="container order-params">
+  <%= form_for(@order_release) do |f| %>
+      <%= render 'shared/order_error_messages' %>
+      <div class="row"><h3>Parameters</h3></div>
+      <div class="row">
+        <div class="col-sm-6">
+          <%= f.label 'Purchase Order Number' %>
+          <div class="order-value"><%= f.text_field :purchase_order_number, class: 'form-control' %></div>
+        </div>
+        <div class="col-sm-6">
+          <%= f.label 'Handling Unit Type' %>
+          <div class="order-value"> <%= f.select :handling_unit_type, OrderRelease.handling_unit_types.keys, class: 'form-control' %></div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-6">
+          <%= f.label 'Delivery Date' %>
+          <div class="order-value"><%= f.date_select :delivery_date, class: 'form-control' %></div>
+        </div>
+        <div class="col-sm-6">
+          <%= f.label 'Handling Unit Quantity' %>
+          <div class="order-value"> <%= f.text_field :handling_unit_quantity, class: 'form-control' %></div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-6">
+          <%= f.label 'Delivery Shift' %>
+          <div class="order-value">
+            <%= f.select :delivery_shift, OrderRelease.delivery_shifts.keys %>
+          </div>
+        </div>
+        <div class="col-sm-6">
+          <%= f.label 'Volume' %>
+          <div class="order-value"> <%= f.text_field :volume, class: 'form-control' %></div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-6">
+          <%= f.label 'Mode' %>
+          <div class="order-value">  <%= f.select :mode, OrderRelease.modes.keys, class: 'form-control' %></div>
+        </div>
+      </div>
+      <div class="row"><h4>Destination Info</h4></div>
+      <div class="row">
+        <div class="col-sm-6">
+          <%= f.label 'Destination Name' %>
+          <div class="order-value"> <%=   f.text_field :destination_name, class: 'form-control' %></div>
+        </div>
+        <div class="col-sm-6">
+          <%= f.label 'Destination City' %>
+          <div class="order-value">  <%= f.text_field :destination_city, class: 'form-control' %></div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-6">
+          <%= f.label 'Phone Number' %>
+          <div class="order-value"> <%= f.text_field :phone_number, class: 'form-control' %></div>
+        </div>
+        <div class="col-sm-6">
+          <%= f.label 'Destination Raw Line' %>
+          <div class="order-value">  <%= f.text_field :destination_raw_line_1, class: 'form-control' %></div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-6">
+          <%= f.label 'Destination Country' %>
+          <div class="order-value"> <%= f.text_field :destination_country, class: 'form-control' %></div>
+        </div>
+        <div class="col-sm-6">
+          <%= f.label 'Destination ZIP' %>
+          <div class="order-value">  <%= f.text_field :destination_zip, class: 'form-control' %></div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-6">
+          <%= f.label 'Destination State' %>
+          <div class="order-value"> <%= f.text_field :destination_state, class: 'form-control' %></div>
+        </div>
+      </div>
+      <div class="row"><h4>Origin Info</h4></div>
+      <div class="row">
+        <div class="col-sm-6">
+          <%= f.label 'Origin Name' %>
+
+          <div class="order-value"> <%= f.text_field :origin_name, class: 'form-control' %></div>
+        </div>
+        <div class="col-sm-6">
+          <%= f.label 'Origin City' %>
+          <div class="order-value">  <%= f.text_field :origin_city, class: 'form-control' %></div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-6">
+          <%= f.label 'Origin Country' %>
+          <div class="order-value"> <%= f.text_field :origin_country, class: 'form-control' %></div>
+        </div>
+        <div class="col-sm-6">
+          <%= f.label 'Origin Raw Line' %>
+          <div class="order-value">  <%= f.text_field :origin_raw_line_1, class: 'form-control' %></div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-6">
+          <%= f.label 'Origin State' %>
+          <div class="order-value"> <%= f.text_field :origin_state, class: 'form-control' %></div>
+        </div>
+        <div class="col-sm-6">
+          <%= f.label 'Origin ZIP' %>
+          <div class="order-value">  <%= f.text_field :origin_zip, class: 'form-control' %></div>
+        </div>
+      </div>
+      <div class="row">
+        <%= f.submit "Save changes", class: "btn btn-primary" %>
+      </div>
+  <% end %>
+</div>
+
+

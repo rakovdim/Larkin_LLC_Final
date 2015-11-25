@@ -1,0 +1,93 @@
+<% provide(:title, 'Load Planning') %>
+<div class="container load-planning">
+  <div class="row">
+    <div class="col-sm-4">
+      <label> Delivery Date</label>
+
+      <div class="order-value"><input id="delivery_date_input" type="text" class="datepicker"></div>
+    </div>
+    <div class="col-sm-4"></div>
+    <div class="col-sm-4">
+      <label>Truck</label>
+
+      <div class="order-value"><%= collection_select(:load, :truck, @trucks, 'id', 'name') %></div>
+    </div>
+  </div>
+
+  <div class="row top-buffer-small">
+    <div class="col-sm-4">
+      <label> Delivery Shift</label>
+
+      <div class="order-value"><%= select(:load, :delivery_shift, Load.delivery_shifts.keys) %></div>
+    </div>
+    <div class="col-sm-4"></div>
+    <div class="col-sm-4">
+      <label>Truck Load</label>
+
+      <div class="order-value"><%= @load.total_volume %> / 1400</div>
+    </div>
+  </div>
+  <div class="row top-buffer">
+    <div class="col-sm-4">
+      <h5>Available Orders</h5>
+      <hr>
+    </div>
+    <div class="col-sm-4"></div>
+    <div class="col-sm-4">
+      <h5>Planned Orders</h5>
+      <hr>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-4" >
+      <div class="dt-buttons">
+        <button id="split_order_button" class="btn-link toolbar-button" tabindex="0">Split Order</button>
+        <button id="submit_orders_button" class="btn-link toolbar-button" tabindex="0">Submit Orders</button>
+        <button id="load_next_orders_button" class="btn-link toolbar-button" tabindex="0">Load Next Orders</button>
+      </div>
+      <hr>
+      <table class='table table-striped table-condensed table-bordered table-hover display' id="available_orders">
+        <thead>
+        <tr>
+          <th>
+            <input type="checkbox" id="available_order_checkbox"/>
+          </th>
+          <th>Order №</th>
+          <th>Delivery Date</th>
+          <th>Delivery Shift</th>
+          <th>Type</th>
+          <th>Volume</th>
+          <th>Quantity</th>
+          <th>Address</th>
+          <th>Destination Name</th>
+        </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="col-sm-4"></div>
+    <div class="col-sm-4">
+      <div class="dt-buttons">
+        <button id="return_orders_button" class="btn-link toolbar-button" tabindex="0">Return Orders</button>
+        <button id="split_order_button" class="btn-link toolbar-button" tabindex="0">Split Order</button>
+        <button id="complete_load_button" class="btn-link toolbar-button" tabindex="0">Complete Load</button>
+      </div>
+      <hr>
+      <table class='table table-striped table-condensed table-bordered table-hover display' id="available_orders">
+        <thead>
+        <tr>
+          <th>Order №</th>
+          <th>Delivery Date</th>
+          <th>Delivery Shift</th>
+          <th>Type</th>
+          <th>Volume</th>
+          <th>Quantity</th>
+          <th>Address</th>
+          <th>Destination Name</th>
+        </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</div>

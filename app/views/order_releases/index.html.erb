@@ -1,0 +1,49 @@
+<% provide(:title, 'Order Releases') %>
+<script>
+  window._token = '<%= form_authenticity_token %>';
+</script>
+<div class="container">
+  <div>
+    <div class="dt-buttons">
+      <button id="upload_button" class="btn-link toolbar-button" tabindex="0">
+        Upload Orders
+      </button>
+    </div>
+    <table class='table table-striped table-condensed table-bordered table-hover display' id="order_releases_list">
+      <thead>
+      <tr>
+        <th>Order №</th>
+        <th>Delivery Date</th>
+        <th>Delivery Shift</th>
+        <th>Status</th>
+        <th>Type</th>
+        <th>Origin Address</th>
+        <th>Destination Address</th>
+        <th>Phone Number</th>
+        <th>Volume</th>
+        <th>Unit Quantity</th>
+      </tr>
+      </thead>
+      <tbody>
+      <% @order_releases.each do |order_release| %>
+          <tr>
+            <td><%= link_to order_release.purchase_order_number, order_release %></td>
+            <td><%= order_release.delivery_date %></td>
+            <td><%= order_release.delivery_shift %></td>
+            <td><%= order_release.status %></td>
+            <td><%= order_release.delivery_type %></td>
+            <td><%= order_release.origin_city << ' ' << order_release.origin_raw_line_1 %></td>
+            <td><%= order_release.destination_city << ' ' << order_release.destination_raw_line_1 %></td>
+            <td><%= order_release.phone_number %></td>
+            <td><%= order_release.volume %></td>
+            <td><%= order_release.handling_unit_quantity %></td>
+          </tr>
+      <% end %>
+      </tbody>
+    </table>
+  </div>
+  <%= will_paginate @order_releases %>
+</div>
+<div class="system">
+  <input id="upload_input" type="file" class="upload"/>
+</div>

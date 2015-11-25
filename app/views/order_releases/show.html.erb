@@ -1,0 +1,134 @@
+<% provide(:title, "Order Release: "+@order_release.purchase_order_number) %>
+<div class="container order-params">
+  <div class="row">
+    <%= link_to "Edit", edit_order_release_path(@order_release) %>
+    <%= link_to "Back", order_releases_path %>
+  </div>
+    <div class="row"><h3>Parameters</h3></div>
+  <div class="row">
+    <div class="col-sm-6">
+      <label>Purchase Order Number</label>
+
+      <div class="order-value"><%= @order_release.purchase_order_number %></div>
+    </div>
+    <div class="col-sm-6">
+      <label>Handling Unit Type</label>
+
+      <div class="order-value"> <%= @order_release.handling_unit_type %></div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-6">
+      <label>Delivery Date</label>
+
+      <div class="order-value"><%= @order_release.delivery_date %></div>
+    </div>
+    <div class="col-sm-6">
+      <label>Handling Unit Quantity</label>
+
+      <div class="order-value"> <%= @order_release.handling_unit_quantity %></div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-6">
+      <label>Delivery Shift</label>
+
+      <div class="order-value"><%= @order_release.delivery_shift %></div>
+    </div>
+    <div class="col-sm-6">
+      <label>Volume</label>
+
+      <div class="order-value"> <%= @order_release.volume %></div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-6">
+      <label>Mode</label>
+
+      <div class="order-value"><%= @order_release.mode %></div>
+    </div>
+  </div>
+  <div class="row"><h4>Destination Info</h4></div>
+  <div class="row">
+    <div class="col-sm-6">
+      <label>Destination Name</label>
+
+      <div class="order-value"><%= @order_release.destination_name %></div>
+    </div>
+    <div class="col-sm-6">
+      <label>Destination City</label>
+
+      <div class="order-value"> <%= @order_release.destination_city %></div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-6">
+      <label>Phone Number</label>
+
+      <div class="order-value"><%= @order_release.phone_number %></div>
+    </div>
+    <div class="col-sm-6">
+      <label>Destination Raw Line</label>
+
+      <div class="order-value"> <%= @order_release.destination_raw_line_1 %></div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-6">
+      <label>Destination Country</label>
+
+      <div class="order-value"><%= @order_release.destination_country %></div>
+    </div>
+    <div class="col-sm-6">
+      <label>Destination ZIP</label>
+
+      <div class="order-value"> <%= @order_release.destination_zip %></div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-6">
+      <label>Destination State</label>
+
+      <div class="order-value"><%= @order_release.destination_state %></div>
+    </div>
+
+  </div>
+  <div class="row"><h4>Origin Info</h4></div>
+  <div class="row">
+    <div class="col-sm-6">
+      <label>Origin Name</label>
+
+      <div class="order-value"><%= @order_release.origin_name %></div>
+    </div>
+    <div class="col-sm-6">
+      <label>Origin City</label>
+
+      <div class="order-value"> <%= @order_release.origin_city %></div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-6">
+      <label>Origin Country</label>
+
+      <div class="order-value"><%= @order_release.origin_country %></div>
+    </div>
+    <div class="col-sm-6">
+      <label>Origin Raw Line</label>
+
+      <div class="order-value"> <%= @order_release.origin_raw_line_1 %></div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-6">
+      <label>Origin State</label>
+
+      <div class="order-value"><%= @order_release.origin_state %></div>
+    </div>
+    <div class="col-sm-6">
+      <label>Origin ZIP</label>
+
+      <div class="order-value"> <%= @order_release.origin_zip %></div>
+    </div>
+  </div>
+</div>
+

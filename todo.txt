@@ -1,0 +1,16 @@
+1 - validate OR[+]
+7 - delivery type should be calculable[+]
+10 - when back from edit, then datatable error[+]
+11 - stop validation if attribute is blank[+]
+
+2 - prevent bad routes
+3 - exception handling filter
+4 - handle routing error
+5 - roles refactoring
+6 - validate format of csv
+8 - CSV performance tuning
+9 - date format validation
+12 - ajax button doesn't work after first upload
+13 - 500400090 and origin_zip is number after upload
+14- show actual truck capacity in UI with returns
+15- back to load_planning not working

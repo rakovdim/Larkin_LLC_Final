@@ -1,0 +1,161 @@
+@import "bootstrap-sprockets";
+@import "bootstrap";
+
+
+/* mixins, variables, etc. */
+
+$gray-medium-light: #eaeaea;
+
+@mixin box_sizing {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+/* miscellaneous */
+.toolbar-button {
+  color: darkblue;
+}
+
+label {
+  font-weight: normal;
+}
+
+.orders_caption {
+  float: left;
+  alignment: left;
+  color: black;
+}
+
+/* universal */
+
+#error_explanation {
+  color: red;
+  ul {
+    color: red;
+    margin: 0 0 10px 0;
+  }
+}
+
+.field_with_errors {
+  @extend .has-error;
+  .form-control {
+    color: $state-danger-text;
+  }
+}
+
+header {
+  div {
+    ul {
+      float: right;
+      li {
+        float: left;
+      }
+
+    }
+  }
+}
+
+section {
+  overflow: auto;
+}
+
+textarea {
+  resize: vertical;
+}
+
+.center {
+  text-align: center;
+  h1 {
+    margin-bottom: 10px;
+  }
+}
+
+/* typography */
+
+h1, h2, h3, h4, h5, h6 {
+  line-height: 1;
+}
+
+h1 {
+  font-size: 3em;
+  letter-spacing: -2px;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+h2 {
+  font-size: 1.2em;
+  letter-spacing: -1px;
+  margin-bottom: 30px;
+  text-align: center;
+  font-weight: normal;
+  color: $gray-light;
+}
+
+/* header */
+
+#logo {
+  float: left;
+  margin-right: 10px;
+  font-size: 1.7em;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: -1px;
+  padding-top: 9px;
+  font-weight: bold;
+  &:hover {
+    color: white;
+    text-decoration: none;
+  }
+}
+
+body {
+  padding-top: 60px;
+}
+
+/* footer */
+
+.system {
+  visibility: hidden;
+}
+
+.order-attribute {
+  float: left;
+}
+
+.order-value {
+  float: right;
+  width: 220px;
+  .value-text {
+    text-align: right;
+  }
+}
+
+tr, th, td {
+  text-align: center;
+  vertical-align: middle;
+  horiz-align: center;
+}
+
+.order-params {
+  width: 90%;
+}
+
+.top-buffer {
+  margin-top: 20px;
+}
+
+.top-buffer-small {
+  margin-top: 10px;
+}
+
+hr {
+  clear: both;
+  margin: 0;
+}
+
+.load-planning {
+  width: 100%;
+  margin-left: 0;
+}

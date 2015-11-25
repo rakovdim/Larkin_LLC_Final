@@ -1,0 +1,2 @@
+class InternalLoadConstructingException < Exception
+end

@@ -1,0 +1,2 @@
+class LoadConstructingException < Exception
+end
