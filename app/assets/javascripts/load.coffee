@@ -280,14 +280,14 @@ class SplitDialog
 
   isVolumeValid: (currentVolume) ->
     valid = this.isDataValid("volume", this.getNewVolume(), currentVolume)
-    if (!this.isFloat(this.getNewVolume()) && !this.isInt(this.getNewVolume()))
-      this.setTips("Volume should be float")
+    if (valid && !this.isNum(this.getNewVolume()))
+      this.setTips("Volume should be number")
       valid = false
     valid
 
   isQuantityValid: (currentQuantity) ->
     valid = this.isDataValid("quantity", this.getNewQuantity(), currentQuantity)
-    if (!this.isInt(this.getNewQuantity()))
+    if (valid && !this.isInt(this.getNewQuantity()))
       this.setTips("Quantity should be integer")
       valid = false
     valid
@@ -311,12 +311,10 @@ class SplitDialog
     true
 
   isInt: (n)->
-    console.log (n)
-    console.log (Number(n) == n && n % 1 == 0)
-    Number(n) == n && n % 1 == 0;
+    !isNaN(parseInt(n,10))
 
-  isFloat: (n)->
-    n == Number(n) && n % 1 != 0;
+  isNum: (n)->
+    !isNaN(parseFloat(n))
 
 
 class PageStructure
@@ -414,7 +412,7 @@ class LoadController
     else
       orderData = ordersData[0]
       if (orderData.handling_unit_quantity == 1 || orderData.volume == 0)
-        alert "Handling unit quantity is 1 or volume is 0 for this order. You can't split it"
+        alert "Quantity is 1 or volume is 0 for this order. You can't split it"
       else
         splitDialog = @pageStructure.splitOrderDialog
         splitDialog.setNewVolume(orderData.volume)
@@ -468,7 +466,7 @@ class LoadController
       success: (data) =>
         this.processOrdersUpdate(data, successMessage)
       error: (data)=>
-        alert this.internalErrorMessage
+        alert this.internalErrorMessage()
     })
 
   processOrdersUpdate: (data, successMessage) ->
@@ -508,10 +506,10 @@ class LoadController
     }
 
   splitOrderRequest: (orderId, newQuantity, newVolume) ->
-    {orderId: orderId, new_quantity: newQuantity, new_volume: newVolume}
+    {order_id: orderId, new_quantity: newQuantity, new_volume: newVolume}
 
   reorderOrdersRequest: (orderId, oldPos, newPos)->
-    {orderId: orderId, old_position: oldPos, new_position: newPos}
+    {order_id: orderId, old_position: oldPos, new_position: newPos}
 
 
 
