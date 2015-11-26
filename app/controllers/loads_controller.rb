@@ -1,15 +1,20 @@
 class LoadsController < ApplicationController
   def index
     authorize_operation! :index
-    @load = LoadService.new.get_current_load
-    puts @load.delivering_total_volume
-    @trucks = Truck.all
+    current_load_response = LoadService.new.get_current_load
+    @trucks = current_load_response.all_trucks
+    @load = current_load_response.load
   end
 
   def split_order
     process_update_load_request(split_order_request, lambda { |request|
       OrderReleaseService.new.split_order(request)
     })
+  end
+
+  def update_load_data
+    process_update_load_request(update_load_request, lambda { |request|
+      LoadService.new.update_load_data(request) })
   end
 
   #todo how warning
@@ -32,6 +37,11 @@ class LoadsController < ApplicationController
   def complete_load
     process_update_load_request(date_shift_request, lambda { |request|
       LoadService.new.complete_load(request) })
+  end
+
+  def reopen_load
+    process_update_load_request(date_shift_request, lambda { |request|
+      LoadService.new.reopen_load(request) })
   end
 
   def get_planning_orders
@@ -73,7 +83,7 @@ class LoadsController < ApplicationController
   end
 
   def date_shift_request
-    DateShiftRequest.new(get_delivery_date, get_delivery_shift)
+    DateShiftRequest.new(get_request_date, get_request_shift)
   end
 
   def collect_orders_request
@@ -82,7 +92,7 @@ class LoadsController < ApplicationController
 
   def submit_return_orders_request
     order_ids = params.require(:orders)
-    truck_id = params.require(:truck)
+    truck_id = params.require(:truck_id)
 
     numeric_order_ids = []
     order_ids.each do |order_id|
@@ -96,12 +106,16 @@ class LoadsController < ApplicationController
     OrdersReorderingRequest.new(params.require(:order_id).to_i, params.require(:old_position).to_i, params.require(:new_position).to_i)
   end
 
+  def update_load_request
+    UpdateLoadRequest.new(get_request_date, get_request_shift, params.require(:truck_id))
+  end
+
   def split_order_request
     SplitOrderRequest.new(params.require(:order_id).to_i, params.require(:new_quantity).to_i, params.require(:new_volume).to_i)
   end
 
   def process_success_response
-    {:status => 'success'} #, :load_status => load.status.humanize, :truck_volume => '%.2f' % load.delivering_total_volume}
+    {:status => 'success'}
   end
 
   def process_warning_response(message)

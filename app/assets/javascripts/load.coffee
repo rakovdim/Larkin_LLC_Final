@@ -7,6 +7,13 @@ class PageStructureBuilder
     @pageStructure = new PageStructure()
     @loadController.setPageStructure(@pageStructure)
 
+  addReopenLoadButton: (buttonId)->
+    button = $('#' + buttonId)
+    @pageStructure.setReopenLoadButton(button)
+    button.click =>
+      @loadController.reopenLoad()
+    this
+
   addSplitAvOrderButton: (buttonId) ->
     @pageStructure.setSplitAvOrderButtonId(buttonId)
     table = @pageStructure.availableOrdersTable
@@ -27,19 +34,19 @@ class PageStructureBuilder
     @pageStructure.setLoadStatusLabelId(loadStatusLabelId)
     this
 
-  addSubmitOrdersListener: (buttonId)->
+  addSubmitOrdersButton: (buttonId)->
     @pageStructure.setSubmitButtonId(buttonId)
     $('#' + buttonId).click =>
       @loadController.submitOrders()
     this
 
-  addCompleteLoadListener: (buttonId)->
+  addCompleteLoadButton: (buttonId)->
     @pageStructure.setCompleteLoadButtonId(buttonId)
     $('#' + buttonId).click =>
       @loadController.completeLoad()
     this
 
-  addReturnOrdersListener: (buttonId)->
+  addReturnOrdersButton: (buttonId)->
     @pageStructure.setReturnButtonId(buttonId)
     $('#' + buttonId).click =>
       @loadController.returnOrders()
@@ -55,8 +62,11 @@ class PageStructureBuilder
       @loadController.changeDate()
     this
 
-  addTruckInput: (truckInputId)->
-    @pageStructure.setTruckSelect($('#' + truckInputId))
+  addTruckSelect: (truckInputId)->
+    truckSelect = $('#' + truckInputId)
+    @pageStructure.setTruckSelect(truckSelect)
+    truckSelect.change =>
+      @loadController.changeTruckForLoad()
     this
 
   addDeliveryShiftSelect: (deliveryShiftSelectId) ->
@@ -93,7 +103,7 @@ class PageStructureBuilder
       @loadController.checkAllOrders(table)
     this
 
-#todo it is performed after ajax request has been sent. it is incorrect
+#todo it is performed after ajax request has been sent. Maybe it is incorrect
   addRefreshTableListener: (table) ->
     table.API.on 'xhr.dt', (e, settings, json, xhr) =>
       @loadController.updatePageDataSync(json)
@@ -170,7 +180,6 @@ class PageStructureBuilder
       buttons: {
         "Split Order": =>
           orderData = @pageStructure.splitOrderDialog.jqueryDialog.data('orderData')
-          console.log (orderData)
           @loadController.splitOrderFromDialog(orderData)
         Cancel: =>
           @pageStructure.splitOrderDialog.jqueryDialog.dialog("close")
@@ -311,7 +320,8 @@ class SplitDialog
     true
 
   isInt: (n)->
-    !isNaN(parseInt(n,10))
+    result = parseInt(n, 10)
+    !isNaN(result) && (Math.floor(n) == result)
 
   isNum: (n)->
     !isNaN(parseFloat(n))
@@ -319,6 +329,7 @@ class SplitDialog
 
 class PageStructure
   constructor: ->
+  setLoadId: (@loadId)->
   setPlanningOrdersTable: (@planningOrdersTable)->
   setAvailableOrdersTable: (@availableOrdersTable)->
   setDeliveryShiftSelectId: (@deliveryShiftSelectId)->
@@ -332,6 +343,7 @@ class PageStructure
   setSplitAvOrderButtonId: (@splitAvOrderButtonId)->
   setSplitPlanOrderButtonId: (@splitPlanOrderButtonId)->
   setSplitOrderDialog: (@splitOrderDialog)->
+  setReopenLoadButton: (@setReopenLoadButton)->
 
   isAlreadyInit: ->
     this.isTableInit(@planningOrdersTable)
@@ -346,7 +358,7 @@ class PageStructure
   getDeliveryDate: ->
     $('#' + @deliveryDateInputId).val()
 
-  getTruck: ->
+  getTruckId: ->
     @truckSelect.val()
 
   setTruck: (truckId) ->
@@ -372,12 +384,14 @@ class PageStructure
 
   updatePageData: (pageData)->
     if (pageData != null && pageData != undefined)
+      this.setLoadId(pageData.load_id)
       if (pageData.truck_volume != null)
         this.setTruckVolume(pageData.truck_volume)
       if (pageData.load_status != null)
         this.setLoadStatus (pageData.load_status)
-      if (pageData.truck != null && pageData.truck != undefined )
-        this.setTruck(pageData.truck)
+      if (pageData.truck_id != null && pageData.truck_id != undefined)
+        this.setTruck(pageData.truck_id)
+
 
   reloadTables: (savePagination)->
     @planningOrdersTable.refresh(savePagination)
@@ -398,6 +412,10 @@ class LoadController
   changeShift: ->
     @pageStructure.reloadTables(false)
 
+  changeTruckForLoad: ->
+    if (@pageStructure.loadId != null && @pageStructure.loadId != undefined )
+      this.executeAjaxRequest('/update_load_data', this.updateLoadRequest())
+
   updatePageDataSync: (data)->
     @pageStructure.updatePageData(data)
 
@@ -406,7 +424,6 @@ class LoadController
 
   openSplitOrderDialog: (table) ->
     ordersData = table.getCheckedOrdersData()
-    console.log (ordersData)
     if (ordersData.length != 1)
       alert 'Please select one order to split'
     else
@@ -437,9 +454,12 @@ class LoadController
     console.log (orderId + '__' + newQuantity + '__' + newVolume)
     this.executeAjaxRequest('/split_order', this.splitOrderRequest(orderId, newQuantity, newVolume))
 
+  reopenLoad: ->
+    this.executeAjaxRequest('/reopen_load', this.genericLoadRequest(), 'Load has been successfully reopened')
+
   completeLoad: ->
     if (@pageStructure.planningOrdersTable.getOrdersCount() > 0)
-      this.executeAjaxRequest('/complete_load', this.completeLoadRequest(), 'Load has been successfully planned for delivery')
+      this.executeAjaxRequest('/complete_load', this.genericLoadRequest(), 'Load has been successfully planned for delivery')
     else
       alert 'Cant complete load. No orders. Submit at least one order'
 
@@ -491,10 +511,17 @@ class LoadController
   internalErrorMessage: ->
     'Internal error occurs. Please contact to your administrator'
 
-  completeLoadRequest: ->
+  genericLoadRequest: ->
     {
     delivery_date: @pageStructure.getDeliveryDate()
     delivery_shift: @pageStructure.getDeliveryShift()
+    }
+
+  updateLoadRequest: ->
+    {
+    delivery_date: @pageStructure.getDeliveryDate()
+    delivery_shift: @pageStructure.getDeliveryShift()
+    truck_id: @pageStructure.getTruckId()
     }
 
   submitReturnOrdersRequest: (table)->
@@ -502,7 +529,7 @@ class LoadController
     delivery_date: @pageStructure.getDeliveryDate()
     delivery_shift: @pageStructure.getDeliveryShift()
     orders: table.getCheckedOrderIds()
-    truck: @pageStructure.getTruck()
+    truck_id: @pageStructure.getTruckId()
     }
 
   splitOrderRequest: (orderId, newQuantity, newVolume) ->
@@ -523,15 +550,16 @@ $(document).on "page:change", ->
   pageBuilder.addDeliveryShiftSelect('load_delivery_shift').
   addTruckVolumeLabel('truck_volume').
   addDeliveryDateInput('delivery_date_input').
-  addTruckInput('load_truck').
+  addTruckSelect('load_truck').
   addAvailableOrdersTable('available_orders').
   addPlanningOrdersTable('planning_orders').
-  addSubmitOrdersListener('submit_orders_button').
-  addReturnOrdersListener('return_orders_button').
-  addCompleteLoadListener('complete_load_button').
+  addSubmitOrdersButton('submit_orders_button').
+  addReturnOrdersButton('return_orders_button').
+  addCompleteLoadButton('complete_load_button').
   addLoadStatusLabel('load_status_value').
   addSplitOrderDialog('split_order_dialog').
   addSplitAvOrderButton('split_av_order_button').
-  addSplitPlanOrderButton('split_plan_order_button')
+  addSplitPlanOrderButton('split_plan_order_button').
+  addReopenLoadButton('reopen_load_button')
 
 

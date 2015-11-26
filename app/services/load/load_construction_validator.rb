@@ -11,11 +11,13 @@ class LoadConstructionValidator
   def validate_order (order, load)
     validate_order_not_planned (order)
 
-    if !(order.any_time?) && !(order.delivery_shift == load.delivery_shift)
+    if !order.any_time? && order.delivery_shift != load.delivery_shift
       raise LoadConstructingException.new(incorrect_delivery_shift_msg(load, order))
     end
 
     raise LoadConstructingException.new(incorrect_delivery_date_msg(load, order)) if order.delivery_date > load.delivery_date
+
+    raise LoadConstructingException.new("Order #{order.purchase_order_number} is alread in load") if order.load_id != nil
   end
 
   def validate_order_not_planned (order)

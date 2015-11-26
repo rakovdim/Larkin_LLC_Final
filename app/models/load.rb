@@ -6,7 +6,7 @@ class Load < ActiveRecord::Base
   has_many :order_releases, -> { order(stop_order_number: :asc) }, :autosave => true
   belongs_to :truck
 
-  def delivering_total_volume
+  def total_volume
     total_volume = 0
     order_releases.each do |order_release|
       total_volume = total_volume+order_release.volume

@@ -25,7 +25,7 @@
       <label>Truck Load</label>
 
       <div class="order-value">
-        <label id="truck_volume"><%= '%.2f' % @load.delivering_total_volume %> </label> / 1400
+        <label id="truck_volume"><%= '%.2f' % @load.total_volume %> </label> / 1400
       </div>
     </div>
   </div>
@@ -75,6 +75,7 @@
         <button id="return_orders_button" class="btn-link toolbar-button" tabindex="0">Return Orders</button>
         <button id="split_plan_order_button" class="btn-link toolbar-button" tabindex="0">Split Order</button>
         <button id="complete_load_button" class="btn-link toolbar-button" tabindex="0">Complete Load</button>
+        <button id="reopen_load_button" class="btn-link toolbar-button" tabindex="0">Reopen Load</button>
       </div>
       <hr>
       <table class='planning_orders_table table table-striped table-condensed table-bordered table-hover display' id="planning_orders">

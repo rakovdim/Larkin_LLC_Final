@@ -16,6 +16,8 @@ Rails.application.routes.draw do
   post 'reorder_planning_orders' => 'loads#reorder_planning_orders'
   post 'complete_load' => 'loads#complete_load'
   post 'split_order' => 'loads#split_order'
+  post 'update_load_data' => 'loads#update_load_data'
+  post 'reopen_load' => 'loads#reopen_load'
 
 
   get 'login' => 'sessions#new'

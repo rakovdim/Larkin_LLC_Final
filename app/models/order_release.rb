@@ -55,7 +55,7 @@ class OrderRelease < ActiveRecord::Base
   end
 
   def self.not_planned_status
-     OrderRelease.statuses.to_a[0][0]
+    OrderRelease.statuses.to_a[0][0]
   end
 
   private

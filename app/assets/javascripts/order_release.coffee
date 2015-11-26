@@ -8,7 +8,7 @@ class OrdersPageStructure
   setUploadInput: (@upload_input_id)->
 
   isDataTableInit: ->
-    $.fn.dataTable.isDataTable('#'+@table_id)
+    $.fn.dataTable.isDataTable('#' + @table_id)
 
 class PageStructureBuilder
   constructor: ->
@@ -53,6 +53,8 @@ class OrdersController
         worker: true
         skipEmptyLines: true
         complete: (results, file) =>
+#console.log ('completed')
+#console.log (results.data)
           this.try_upload JSON.stringify(results.data)
       )
     else
@@ -73,6 +75,7 @@ class OrdersController
     }).append($('<input>', {
       'name': 'data'
       'value': orders_as_json.replace(new RegExp("client name", 'g'), "destination_name")
+#'value': orders_as_json
     })).append($('<input>', {
       'type': 'hidden',
       'name': 'authenticity_token',
