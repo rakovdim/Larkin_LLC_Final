@@ -14,3 +14,4 @@
 13 - 500400090 and origin_zip is number after upload
 14- show actual truck capacity in UI with returns
 15- back to load_planning not working
+16 - prevent open splitting dialog several times in same time

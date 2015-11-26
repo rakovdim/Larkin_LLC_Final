@@ -1,4 +1,4 @@
-class OrdersResponse
+class OrdersCollectingResponse
   def initialize (data, recordsTotal, load_status, truck_volume)
     @data = data
     @recordsTotal = recordsTotal

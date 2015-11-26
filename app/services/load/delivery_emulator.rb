@@ -24,7 +24,7 @@ class DeliveryEmulator
     @load.order_releases.each do |order|
       puts "try to deliver order: #{order.purchase_order_number}, truck volume: #{@in_truck_orders_volume}"
       perform_delivery_step(order)
-      validate_truck_overload(order)
+      #validate_truck_overload(order)
     end
   end
 
@@ -39,7 +39,7 @@ class DeliveryEmulator
 
   def validate_truck_overload(order)
     if @in_truck_orders_volume > @truck_capacity
-      raise LoadConstructingException.new ('Not enough capacity in load because of order: '+order.purchase_order_number)
+      raise DeliveryFailException.new ('Not enough capacity in load because of order: '+order.purchase_order_number)
     end
   end
 end

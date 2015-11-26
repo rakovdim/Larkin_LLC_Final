@@ -22,10 +22,6 @@ class LoadConstructionValidator
     raise LoadConstructingException.new(incorrect_order_status_msg(order)) unless order.not_planned?
   end
 
-  def truck_is_overloaded_error_msg (truck, load)
-    'Truck is overloaded. Truck capacity: '+truck.capacity.to_s+', current volume: '+load.total_volume.to_s
-  end
-
   def incorrect_load_status_msg(load)
     'Cant perform operation. Incorrect load status: '+load.status
   end

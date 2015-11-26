@@ -25,5 +25,7 @@ module LarkinLlcFinal
     config.assets.precompile += %w(*.png *.jpg *.jpeg *.gif)
     config.autoload_paths += %W(#{config.root}/app/services/load)
     config.autoload_paths += %W(#{config.root}/app/services/order_release)
+    config.autoload_paths += %W(#{config.root}/app/services/load/dto)
+    config.autoload_paths += %W(#{config.root}/app/services/order_release/dto)
   end
 end

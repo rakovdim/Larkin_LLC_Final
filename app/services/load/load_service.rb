@@ -16,9 +16,9 @@ class LoadService
     Load.where('delivery_date=? and delivery_shift=?', delivery_date, delivery_shift).first
   end
 
-  def complete_load (delivery_date, delivery_shift)
+  def complete_load (date_shift_request)
     ActiveRecord::Base.transaction do
-      load = get_load_by_date_and_shift(delivery_date, delivery_shift)
+      load = get_load_by_date_and_shift(date_shift_request.delivery_date, date_shift_request.delivery_shift)
       puts load.id
       @load_validator.validate_load_not_planned(load)
       load.order_releases.each do |order_release|

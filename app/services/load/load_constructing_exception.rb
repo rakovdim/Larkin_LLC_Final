@@ -1,2 +1,2 @@
-class LoadConstructingException < Exception
+class LoadConstructingException < BusinessException
 end

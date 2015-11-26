@@ -25,6 +25,23 @@
   text-align: center;
 }
 
-.load_planning{
+.load_planning {
   font-size: 12px;
+}
+
+.ui-dialog .ui-state-error {
+  padding: .3em;
+}
+
+.validateTips {
+  border: 1px solid transparent;
+  padding: 0.3em;
+}
+
+input[type=checkbox]
+{
+  /* Double-sized Checkboxes */
+  -webkit-transform: scale(1); /* FF */
+  transform: scale(1); /* Safari and Chrome */
+  padding: 5px;
 }

@@ -1,5 +1,20 @@
 class OrderReleaseService
 
+  def split_order(split_order_request)
+    ActiveRecord::Base.transaction do
+      order_release = OrderRelease.find(split_order_request.order_id)
+
+      LoadConstructionValidator.new.validate_order_not_planned(order_release)
+      raise SplitOrderException.new ("Can't split order #{order_release.purchase_order_number}. Not enough quantity") if order_release.handling_unit_quantity <= split_order_request.new_quantity
+      raise SplitOrderException.new ("Can't split order #{order_release.purchase_order_number}. Not enough volume") if order_release.volume <= split_order_request.new_volume
+
+      remaining_order_release = perform_splitting(order_release, split_order_request.new_quantity, split_order_request.new_volume)
+
+      order_release.save!
+      remaining_order_release.save!
+    end
+  end
+
   def collect_planning_orders (orders_request)
     ActiveRecord::Base.transaction do
       planning_orders = []
@@ -10,10 +25,10 @@ class OrderReleaseService
       if load
         planning_orders = load.order_releases
         load_status = load.status.humanize
-        truck_volume = '%.2f' % load.delivering_total_volume
+        truck_volume = load.delivering_total_volume
       end
 
-      OrdersResponse.new planning_orders, planning_orders.length, load_status, truck_volume
+      OrdersCollectingResponse.new planning_orders, planning_orders.length, load_status, truck_volume
     end
   end
 
@@ -25,7 +40,7 @@ class OrderReleaseService
       found_orders = where_query_for_orders.select(orders_request.required_columns).offset(orders_request.start).limit(orders_request.length)
       total_count = where_query_for_orders.count
       puts found_orders.length
-      OrdersResponse.new found_orders, total_count, nil, nil
+      OrdersCollectingResponse.new found_orders, total_count, nil, nil
     end
   end
 
@@ -68,5 +83,15 @@ class OrderReleaseService
     OrderRelease.where('delivery_shift IN (?) and delivery_date <= ? and status=? and load_id is null',
                        [delivery_shift, OrderRelease.delivery_shifts[:any_time]], delivery_date, OrderRelease.statuses[:not_planned]).
         order(:delivery_shift)
+  end
+
+  def perform_splitting(order_release, new_volume, new_quantity)
+    remaining_order_release = order_release.clone
+    order_release.volume = new_volume
+    order_release.handling_unit_quantity = new_quantity
+    remaining_order_release.volume = remaining_order_release.volume-new_volume
+    remaining_order_release.handling_unit_quantity = remaining_order_release.handling_unit_quantity-new_quantity
+    remaining_order_release.load_id = nil
+    remaining_order_release
   end
 end

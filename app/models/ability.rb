@@ -41,6 +41,7 @@ class Ability
     can :get_planning_orders, Load if user.has_role? 'dispatcher'
     can :update_orders, Load if user.has_role? 'dispatcher'
     can :complete_load, Load if user.has_role? 'dispatcher'
+    can :load_planning, Load if user.has_role? 'dispatcher'
 
     can :list, :all if user.has_role? 'driver'
     #can :list, :User if user.has_role 'driver'

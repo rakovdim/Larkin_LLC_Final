@@ -1,4 +1,4 @@
-class OrderReorderingRequest
+class OrdersReorderingRequest
   attr_accessor :order_id, :old_position, :new_position
 
   def initialize(order_id, old_position, new_position)

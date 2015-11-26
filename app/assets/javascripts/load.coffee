@@ -3,120 +3,116 @@
 # You can use CoffeeScript in this file: http://coffeescript.org/
 
 class PageStructureBuilder
-  constructor: (@load_controller) ->
-    @page_structure = new PageStructure()
-    @load_controller.setPageStructure(@page_structure)
+  constructor: (@loadController) ->
+    @pageStructure = new PageStructure()
+    @loadController.setPageStructure(@pageStructure)
 
-  addSplitOrderDialog: (split_order_dialog_id, split_action) ->
-    dialog = $('#' + split_order_dialog_id).dialog({
-      autoOpen: false
-      height: 250
-      width: 350
-      modal: true
-      buttons: {
-        "Split Order": ->
-          console.log('aaaa')
-          split_action()
-        Cancel: ->
-          dialog.dialog("close")
-      }
-      close: ->
-        dialog.find("form")[0].reset()
-    })
+  addSplitAvOrderButton: (buttonId) ->
+    @pageStructure.setSplitAvOrderButtonId(buttonId)
+    table = @pageStructure.availableOrdersTable
+    this.addSplitOrderButton(buttonId, table)
+    this
+
+  addSplitPlanOrderButton: (buttonId) ->
+    @pageStructure.setSplitPlanOrderButtonId(buttonId)
+    table = @pageStructure.planningOrdersTable
+    this.addSplitOrderButton(buttonId, table)
+    this
+
+  addSplitOrderButton: (buttonId, table) ->
+    $('#' + buttonId).click =>
+      @loadController.openSplitOrderDialog(table)
 
   addLoadStatusLabel: (loadStatusLabelId) ->
-    @page_structure.setLoadStatusLabelId(loadStatusLabelId)
+    @pageStructure.setLoadStatusLabelId(loadStatusLabelId)
     this
 
-  addSubmitOrdersListener: (button_id)->
-    @page_structure.setSubmitButtonId(button_id)
-    $('#' + button_id).click =>
-      @load_controller.submitOrders()
+  addSubmitOrdersListener: (buttonId)->
+    @pageStructure.setSubmitButtonId(buttonId)
+    $('#' + buttonId).click =>
+      @loadController.submitOrders()
     this
 
-  addCompleteLoadListener: (button_id)->
-    @page_structure.setCompleteLoadButtonId(button_id)
-    $('#' + button_id).click =>
-      @load_controller.completeLoad()
+  addCompleteLoadListener: (buttonId)->
+    @pageStructure.setCompleteLoadButtonId(buttonId)
+    $('#' + buttonId).click =>
+      @loadController.completeLoad()
     this
 
-  addReturnOrdersListener: (button_id)->
-    @page_structure.setReturnButtonId(button_id)
-    $('#' + button_id).click =>
-      @load_controller.returnOrders()
+  addReturnOrdersListener: (buttonId)->
+    @pageStructure.setReturnButtonId(buttonId)
+    $('#' + buttonId).click =>
+      @loadController.returnOrders()
     this
 
-  addTruckVolumeLabel: (truck_volume_label_id)->
-    @page_structure.setTruckVolumeLabelId(truck_volume_label_id)
+  addTruckVolumeLabel: (truckVolumeLabelId)->
+    @pageStructure.setTruckVolumeLabelId(truckVolumeLabelId)
     this
 
-  addDeliveryDateInput: (delivery_date_input_id)->
-    @page_structure.setDeliveryDateInputId(delivery_date_input_id)
-    $('#' + delivery_date_input_id).change =>
-      @load_controller.changeDate()
+  addDeliveryDateInput: (deliveryDateInputId)->
+    @pageStructure.setDeliveryDateInputId(deliveryDateInputId)
+    $('#' + deliveryDateInputId).change =>
+      @loadController.changeDate()
     this
 
-  addTruckInput: (truck_input_id)->
-    @page_structure.setTruckSelectId(truck_input_id)
+  addTruckInput: (truckInputId)->
+    @pageStructure.setTruckSelect($('#' + truckInputId))
     this
 
-  addDeliveryShiftSelect: (delivery_shift_select_id) ->
-    @page_structure.setDeliveryShiftSelectId(delivery_shift_select_id)
-    $('#' + delivery_shift_select_id).change =>
-      @load_controller.changeShift()
+  addDeliveryShiftSelect: (deliveryShiftSelectId) ->
+    @pageStructure.setDeliveryShiftSelectId(deliveryShiftSelectId)
+    $('#' + deliveryShiftSelectId).change =>
+      @loadController.changeShift()
     this
 
-  addAvailableOrdersTable: (table_id) ->
-    if !Table.isDataTableInit(table_id)
-      av_orders_table = this.constructEntireTable(table_id, '/get_available_orders', 'av_orders_checkbox', true, false)
-      @page_structure.setAvailableOrdersTable(av_orders_table)
+  addAvailableOrdersTable: (tableId) ->
+    if !Table.isDataTableInit(tableId)
+      avOrdersTable = this.constructEntireTable(tableId, '/get_available_orders', 'av_orders_checkbox', true, false)
+      @pageStructure.setAvailableOrdersTable(avOrdersTable)
     this
 
-  addPlanningOrdersTable: (table_id)->
-    if !Table.isDataTableInit(table_id)
-      plan_orders_table = this.constructEntireTable(table_id, '/get_planning_orders', 'plan_orders_checkbox', false, true)
-      this.addRowReorderListener(plan_orders_table).addRefreshTableListener(plan_orders_table)
-      @page_structure.setPlanningOrdersTable(plan_orders_table)
+  addPlanningOrdersTable: (tableId)->
+    if !Table.isDataTableInit(tableId)
+      planOrdersTable = this.constructEntireTable(tableId, '/get_planning_orders', 'plan_orders_checkbox', false, true)
+      this.addRowReorderListener(planOrdersTable).addRefreshTableListener(planOrdersTable)
+      @pageStructure.setPlanningOrdersTable(planOrdersTable)
     this
 
-  constructEntireTable: (table_id, ajax_url, all_orders_checkbox_id, paging, dnd) ->
-    table = this.createDataTable(table_id, ajax_url, all_orders_checkbox_id, paging, dnd)
+  constructEntireTable: (tableId, ajaxUrl, allOrdersCheckboxId, paging, dnd) ->
+    table = this.createDataTable(tableId, ajaxUrl, allOrdersCheckboxId, paging, dnd)
     this.addNextPageTableListener(table).addSelectAllOrdersListener(table)
     table
 
   addNextPageTableListener: (table) ->
     table.API.on 'page.dt', =>
-      @load_controller.toNextPage(table)
+      @loadController.toNextPage(table)
     this
 
   addSelectAllOrdersListener: (table) ->
-    $('#' + table.allOrdersCheckbox.checkbox_id).click =>
-      @load_controller.checkAllOrders(table)
+    $('#' + table.allOrdersCheckbox.checkboxId).click =>
+      @loadController.checkAllOrders(table)
     this
 
 #todo it is performed after ajax request has been sent. it is incorrect
   addRefreshTableListener: (table) ->
     table.API.on 'xhr.dt', (e, settings, json, xhr) =>
-      @load_controller.updatePageData(json)
+      @loadController.updatePageDataSync(json)
     this
 
   addRowReorderListener: (table) ->
     table.API.on 'row-reorder', (e, diff, edit) =>
-      order_id = edit.triggerRow.data().id
-      for row_change in diff
-        if (row_change != undefined && row_change.node != undefined && parseInt(row_change.node.id) == order_id)
-          console.log (order_id + '_' + row_change.oldPosition + '_' + row_change.newPosition)
-          @load_controller.reorder_planning_orders(order_id, row_change.oldPosition, row_change.newPosition)
+      orderId = edit.triggerRow.data().id
+      for rowChange in diff
+        if (rowChange != undefined && rowChange.node != undefined && parseInt(rowChange.node.id) == orderId)
+          console.log (orderId + '_' + rowChange.oldPosition + '_' + rowChange.newPosition)
+          @loadController.reorderPlanningOrders(orderId, rowChange.oldPosition, rowChange.newPosition)
           break
     this
 
-  finish: ->
-    @page_structure
-
-  createDataTable: (table_id, ajax_url, all_orders_checkbox_id, paging, dnd) ->
-    table = new Table(table_id)
-    table.setAllOrdersCheckbox(Checkbox.createAllOrdersCheckbox(all_orders_checkbox_id))
-    common_data = {
+  createDataTable: (tableId, ajaxUrl, allOrdersCheckboxId, paging, dnd) ->
+    table = new Table(tableId)
+    table.setAllOrdersCheckbox(Checkbox.createAllOrdersCheckbox(allOrdersCheckboxId))
+    commonData = {
       scrollY: '400px'
       processing: true
       serverSide: true
@@ -130,23 +126,23 @@ class PageStructureBuilder
       bSort: false
       rowId: 'id'
       ajax: {
-        url: ajax_url
+        url: ajaxUrl
         data: (d)=>
           d.columns = null
           d.seatch = null
-          d.delivery_date = @page_structure.getDeliveryDate()
-          d.delivery_shift = @page_structure.getDeliveryShift()
+          d.delivery_date = @pageStructure.getDeliveryDate()
+          d.delivery_shift = @pageStructure.getDeliveryShift()
           d
       }
 
       rowCallback: (row, data, dataIndex)=>
-        order_id = data.id
-        checkbox = Checkbox.createOrderCheckbox(order_id)
-        first_td = $(row).find('td:first')
-        first_td.html(checkbox.toHTMLInput())
+        orderId = data.id
+        checkbox = Checkbox.createOrderCheckbox(orderId)
+        firstTd = $(row).find('td:first')
+        firstTd.html(checkbox.toHTMLInput())
         table.addCheckbox(checkbox)
-        first_td.change '#' + checkbox.checkbox_id, ->
-          console.log (order_id)
+        firstTd.change '#' + checkbox.checkboxId, ->
+          console.log (orderId)
 
       columns: [
         {data: "purchase_order_number"}
@@ -160,54 +156,82 @@ class PageStructureBuilder
         {data: "origin_raw_line_1"}]
     }
     if (dnd)
-      common_data['rowReorder'] = {selector: 'tr td:not(:first-child)'}
+      commonData['rowReorder'] = {selector: 'tr td:not(:first-child)'}
 
-    table.setAPI($('#' + table_id).DataTable(common_data))
+    table.setAPI($('#' + tableId).DataTable(commonData))
     table
 
+  addSplitOrderDialog: (splitOrderDialogId) ->
+    dialog = $('#' + splitOrderDialogId).dialog({
+      autoOpen: false
+      height: 250
+      width: 350
+      modal: true
+      buttons: {
+        "Split Order": =>
+          orderData = @pageStructure.splitOrderDialog.jqueryDialog.data('orderData')
+          console.log (orderData)
+          @loadController.splitOrderFromDialog(orderData)
+        Cancel: =>
+          @pageStructure.splitOrderDialog.jqueryDialog.dialog("close")
+      }
+      close: =>
+        splitOrderDialog = @pageStructure.splitOrderDialog
+        splitOrderDialog.form[0].reset()
+        splitOrderDialog.allFields.removeClass("ui-state-error");
+    })
+    splitDialog = new SplitDialog('new_volume', 'new_quantity', dialog)
+    @pageStructure.setSplitOrderDialog(splitDialog)
+    this
 
 class Checkbox
-  constructor: (@order_id, @checkbox_id)->
-
-  consturctor: (@checkbox_id)->
+  constructor: (@orderId, @checkboxId)->
 
   toHTMLInput: ->
-    '<td class="order-checkbox"><input  type="checkbox" id =' + @checkbox_id + '></td>'
+    '<td class="order-checkbox"><input  type="checkbox" id =' + @checkboxId + '></td>'
 
   isChecked: ->
-    $('#' + @checkbox_id).is(':checked')
+    $('#' + @checkboxId).is(':checked')
 
   setChecked: (checked)->
-    $('#' + @checkbox_id).prop('checked', checked)
+    $('#' + @checkboxId).prop('checked', checked)
 
-  @createOrderCheckbox: (order_id) ->
-    new Checkbox(order_id, 'cb_' + order_id)
+  @createOrderCheckbox: (orderId) ->
+    new Checkbox(orderId, 'cb_' + orderId)
 
-  @createAllOrdersCheckbox: (checkbox_id) ->
-    new Checkbox(null, checkbox_id)
+  @createAllOrdersCheckbox: (checkboxId) ->
+    new Checkbox(null, checkboxId)
 
 class Table
-  constructor: (table_id)->
+  constructor: (tableId)->
     @checkboxesMap = {}
-    @table_id = table_id
+    @tableId = tableId
 
-  @isDataTableInit: (table_id) ->
-    table_id != undefined && $.fn.dataTable.isDataTable('#' + table_id)
+  @isDataTableInit: (tableId) ->
+    tableId != undefined && $.fn.dataTable.isDataTable('#' + tableId)
 
   checkAll: ->
     checked = @allOrdersCheckbox.isChecked()
     $.map(@checkboxesMap, (checkbox)=>
       checkbox.setChecked(checked))
-    console.log (this.getCheckedOrders())
+    console.log (this.getCheckedOrderIds())
 
   getOrdersCount: ->
     @API.rows()[0].length
 
-  getCheckedOrders: ->
+  getCheckedOrderIds: ->
     result = []
     $.map(@checkboxesMap, (checkbox)=>
       if (checkbox.isChecked())
-        result.push checkbox.order_id)
+        result.push(checkbox.orderId))
+    result
+
+  getCheckedOrdersData: ->
+    result = []
+    $.map(@checkboxesMap, (checkbox)=>
+      if (checkbox.isChecked())
+        rowData = @API.row('#' + checkbox.orderId).data()
+        result.push rowData)
     result
 
   setAPI: (API) ->
@@ -223,72 +247,146 @@ class Table
     @API.draw (!preservePaging)
 
   addCheckbox: (checkbox)->
-    @checkboxesMap[checkbox.order_id] = checkbox
+    @checkboxesMap[checkbox.orderId] = checkbox
 
   setAllOrdersCheckbox: (@allOrdersCheckbox)->
 
   isInit: ->
-    $.fn.dataTable.isDataTable(@table_id)
+    $.fn.dataTable.isDataTable(@tableId)
+
+class SplitDialog
+  constructor: (newVolumeId, newQuantityId, @jqueryDialog)->
+    @newVolume = $('#' + newVolumeId)
+    @newQuantity = $('#' + newQuantityId)
+    @allFields = $([]).add(@newVolume).add(@newQuantity)
+    @tips = $(".validateTips");
+    @dialogId = @jqueryDialog.id
+    @form = @jqueryDialog.find("form")
+
+  setVolume: (volume) ->
+    @newVolume.val
+
+  getNewVolume: ->
+    @newVolume.val()
+
+  getNewQuantity: ->
+    @newQuantity.val()
+
+  setNewVolume: (volume) ->
+    @newVolume.val(volume)
+
+  setNewQuantity: (quantity) ->
+    @newQuantity.val(quantity)
+
+  isVolumeValid: (currentVolume) ->
+    valid = this.isDataValid("volume", this.getNewVolume(), currentVolume)
+    if (!this.isFloat(this.getNewVolume()) && !this.isInt(this.getNewVolume()))
+      this.setTips("Volume should be float")
+      valid = false
+    valid
+
+  isQuantityValid: (currentQuantity) ->
+    valid = this.isDataValid("quantity", this.getNewQuantity(), currentQuantity)
+    if (!this.isInt(this.getNewQuantity()))
+      this.setTips("Quantity should be integer")
+      valid = false
+    valid
+
+  setTips: (message)->
+    @tips.text(message).addClass("ui-state-highlight");
+    setTimeout =>
+      @tips.removeClass("ui-state-highlight", 1500)
+    , 500
+
+  isDataValid: (fieldName, value, currentValue) ->
+    if (value == null || value == undefined || value == "")
+      this.setTips("New #{fieldName} can't be empty")
+      return false
+    if (value <= 0)
+      this.setTips("New #{fieldName} should be positive")
+      return false
+    if (value >= currentValue)
+      this.setTips("New #{fieldName} should be less than orignal #{fieldName}")
+      return false
+    true
+
+  isInt: (n)->
+    console.log (n)
+    console.log (Number(n) == n && n % 1 == 0)
+    Number(n) == n && n % 1 == 0;
+
+  isFloat: (n)->
+    n == Number(n) && n % 1 != 0;
 
 
 class PageStructure
   constructor: ->
-  setPlanningOrdersTable: (@planned_orders_table)->
-  setAvailableOrdersTable: (@available_orders_table)->
-  setDeliveryShiftSelectId: (@delivery_shift_select_id)->
-  setDeliveryDateInputId: (@delivery_date_input_id)->
-  setTruckSelectId: (@truck_select_id)->
-  setTruckVolumeLabelId: (@truck_load_volume_id)->
+  setPlanningOrdersTable: (@planningOrdersTable)->
+  setAvailableOrdersTable: (@availableOrdersTable)->
+  setDeliveryShiftSelectId: (@deliveryShiftSelectId)->
+  setDeliveryDateInputId: (@deliveryDateInputId)->
+  setTruckSelect: (@truckSelect)->
+  setTruckVolumeLabelId: (@truckLoadVolumeId)->
   setLoadStatusLabelId: (@loadStatusLabelId)->
-  setSubmitButtonId: (@submit_button_id)->
-  setReturnButtonId: (@return_button_id)->
-  setCompleteLoadButtonId: (@complete_load_button_id)->
+  setSubmitButtonId: (@submitButtonId)->
+  setReturnButtonId: (@returnButtonId)->
+  setCompleteLoadButtonId: (@completeLoadButtonId)->
+  setSplitAvOrderButtonId: (@splitAvOrderButtonId)->
+  setSplitPlanOrderButtonId: (@splitPlanOrderButtonId)->
+  setSplitOrderDialog: (@splitOrderDialog)->
 
   isAlreadyInit: ->
-    this.isTableInit(@planned_orders_table)
-    this.isTableInit(@available_orders_table)
+    this.isTableInit(@planningOrdersTable)
+    this.isTableInit(@availableOrdersTable)
 
   isTableInit: (table) ->
     table != undefined && table.isInit()
 
   getDeliveryShift: ->
-    $('#' + @delivery_shift_select_id).val()
+    $('#' + @deliveryShiftSelectId).val()
 
   getDeliveryDate: ->
-    $('#' + @delivery_date_input_id).val()
+    $('#' + @deliveryDateInputId).val()
 
   getTruck: ->
-    $('#' + @truck_select_id).val()
+    @truckSelect.val()
 
-  setTruckVolume: (capacity) ->
-    $('#' + @truck_load_volume_id).text(capacity);
+  setTruck: (truckId) ->
+    @truckSelect.val(truckId)
 
-  setLoadStatus: (load_status) ->
-    $('#' + @loadStatusLabelId).text(load_status);
-    if (load_status != 'Not planned')
+  setTruckVolume: (volume) ->
+    $('#' + @truckLoadVolumeId).text(Number((volume).toFixed(1)))
+
+  setLoadStatus: (loadStatus) ->
+    $('#' + @loadStatusLabelId).text(loadStatus);
+    if (loadStatus != 'Not planned')
       this.setPageDisabled(true)
     else
       this.setPageDisabled(false)
 
   setPageDisabled: (disabled)->
-    $('#' + @truck_select_id).prop('disabled', disabled)
-    $('#' + @submit_button_id).prop('disabled', disabled)
-    $('#' + @return_button_id).prop('disabled', disabled)
-    $('#' + @complete_load_button_id).prop('disabled', disabled)
+    console.log(@splitPlanOrderButtonId)
+    @truckSelect.prop('disabled', disabled)
+    $('#' + @submitButtonId).prop('disabled', disabled)
+    $('#' + @returnButtonId).prop('disabled', disabled)
+    $('#' + @completeLoadButtonId).prop('disabled', disabled)
+    $('#' + @splitPlanOrderButtonId).prop('disabled', disabled)
 
-  updatePageData: (page_data)->
-    if (page_data != null && page_data != undefined)
-      if (page_data.truck_volume != null)
-        this.setTruckVolume(page_data.truck_volume)
-      if (page_data.load_status != null)
-        this.setLoadStatus (page_data.load_status)
+  updatePageData: (pageData)->
+    if (pageData != null && pageData != undefined)
+      if (pageData.truck_volume != null)
+        this.setTruckVolume(pageData.truck_volume)
+      if (pageData.load_status != null)
+        this.setLoadStatus (pageData.load_status)
+      if (pageData.truck != null && pageData.truck != undefined )
+        this.setTruck(pageData.truck)
 
-  reloadTables: (save_pagination)->
-    @planned_orders_table.refresh(save_pagination)
-    @available_orders_table.refresh(save_pagination)
+  reloadTables: (savePagination)->
+    @planningOrdersTable.refresh(savePagination)
+    @availableOrdersTable.refresh(savePagination)
 
 class LoadController
-  setPageStructure: (@page_structure) ->
+  setPageStructure: (@pageStructure) ->
 
   toNextPage: (table)->
     table.resetCheckboxes()
@@ -297,106 +395,134 @@ class LoadController
     table.checkAll()
 
   changeDate: ->
-    @page_structure.reloadTables(false)
+    @pageStructure.reloadTables(false)
 
   changeShift: ->
-    @page_structure.reloadTables(false)
+    @pageStructure.reloadTables(false)
 
-  updatePageData: (data)->
-    @page_structure.updatePageData(data)
+  updatePageDataSync: (data)->
+    @pageStructure.updatePageData(data)
 
-  reorder_planning_orders: (order_id, oldPos, newPos) ->
-    this.executeAjaxRequest('/reorder_planning_orders', this.reorderOrdersRequest(order_id, oldPos, newPos))
+  reorderPlanningOrders: (orderId, oldPos, newPos) ->
+    this.executeAjaxRequest('/reorder_planning_orders', this.reorderOrdersRequest(orderId, oldPos, newPos))
+
+  openSplitOrderDialog: (table) ->
+    ordersData = table.getCheckedOrdersData()
+    console.log (ordersData)
+    if (ordersData.length != 1)
+      alert 'Please select one order to split'
+    else
+      orderData = ordersData[0]
+      if (orderData.handling_unit_quantity == 1 || orderData.volume == 0)
+        alert "Handling unit quantity is 1 or volume is 0 for this order. You can't split it"
+      else
+        splitDialog = @pageStructure.splitOrderDialog
+        splitDialog.setNewVolume(orderData.volume)
+        splitDialog.setNewQuantity(orderData.handling_unit_quantity)
+        splitDialog.jqueryDialog.data('orderData', orderData).dialog("open");
+
+  splitOrderFromDialog: (orderData)->
+    valid = true;
+    splitDialog = @pageStructure.splitOrderDialog
+    splitDialog.allFields.removeClass("ui-state-error");
+
+    valid = valid && splitDialog.isQuantityValid(orderData.handling_unit_quantity);
+    valid = valid && splitDialog.isVolumeValid(orderData.volume)
+
+    if (valid)
+      this.splitOrder(orderData.id, splitDialog.getNewQuantity(), splitDialog.getNewVolume())
+      splitDialog.jqueryDialog.dialog('close')
+
+    valid
+
+  splitOrder: (orderId, newQuantity, newVolume)->
+    console.log (orderId + '__' + newQuantity + '__' + newVolume)
+    this.executeAjaxRequest('/split_order', this.splitOrderRequest(orderId, newQuantity, newVolume))
 
   completeLoad: ->
-    if (@page_structure.planned_orders_table.getOrdersCount() > 0)
+    if (@pageStructure.planningOrdersTable.getOrdersCount() > 0)
       this.executeAjaxRequest('/complete_load', this.completeLoadRequest(), 'Load has been successfully planned for delivery')
     else
       alert 'Cant complete load. No orders. Submit at least one order'
 
   submitOrders: ->
-    av_orders_table = @page_structure.available_orders_table
-    this.perfromSubmitReturnOrders(av_orders_table, '/submit_orders')
+    avOrdersTable = @pageStructure.availableOrdersTable
+    this.perfromSubmitReturnOrders(avOrdersTable, '/submit_orders')
 
   returnOrders: ->
-    plan_orders_table = @page_structure.planned_orders_table
-    this.perfromSubmitReturnOrders(plan_orders_table, '/return_orders')
+    planOrdersTable = @pageStructure.planningOrdersTable
+    this.perfromSubmitReturnOrders(planOrdersTable, '/return_orders')
 
-  perfromSubmitReturnOrders: (table, url, success_message = undefined)->
-    checked_orders = table.getCheckedOrders()
-    if (checked_orders.length > 0)
-      this.executeAjaxRequest(url, this.submitReturnOrdersRequest(table), success_message)
+  perfromSubmitReturnOrders: (table, url, successMessage = undefined)->
+    checkedOrders = table.getCheckedOrderIds()
+    if (checkedOrders.length > 0)
+      this.executeAjaxRequest(url, this.submitReturnOrdersRequest(table), successMessage)
     else
       alert "Please select at least one order"
 
-  executeAjaxRequest: (request_url, request_data, success_message)->
+  executeAjaxRequest: (requestURL, requestData, successMessage)->
     $.ajax({
-      url: request_url,
+      url: requestURL,
       type: 'POST',
-      data: request_data
+      data: requestData
       success: (data) =>
-        this.processOrdersUpdate(data, success_message)
+        this.processOrdersUpdate(data, successMessage)
       error: (data)=>
         alert this.internalErrorMessage
     })
 
-  processOrdersUpdate: (data, success_message) ->
+  processOrdersUpdate: (data, successMessage) ->
     if (data.status == 'success')
-      this.onUpdateSuccess(data, success_message)
+      this.onUpdateSuccess(data, successMessage)
     else
       this.onUpdateFail(data)
 
-  onUpdateSuccess: (data, success_message) ->
-    if (success_message != undefined )
-      alert success_message
-    @page_structure.reloadTables(true)
+  onUpdateSuccess: (data, successMessage) ->
+    if (successMessage != undefined )
+      alert successMessage
+    @pageStructure.reloadTables(true)
 
   onUpdateFail: (data) ->
     alert('Exception occurs: ' + data.message)
+
+  onUpdateWarning: (data) ->
+    alert('Warning: ' + data.message)
+    @pageStructure.reloadTables(true)
+
 
   internalErrorMessage: ->
     'Internal error occurs. Please contact to your administrator'
 
   completeLoadRequest: ->
     {
-    delivery_date: @page_structure.getDeliveryDate(),
-    delivery_shift: @page_structure.getDeliveryShift()
+    delivery_date: @pageStructure.getDeliveryDate()
+    delivery_shift: @pageStructure.getDeliveryShift()
     }
 
   submitReturnOrdersRequest: (table)->
     {
-    delivery_date: @page_structure.getDeliveryDate(),
-    delivery_shift: @page_structure.getDeliveryShift(),
-    orders: table.getCheckedOrders()
-    truck: @page_structure.getTruck()
+    delivery_date: @pageStructure.getDeliveryDate()
+    delivery_shift: @pageStructure.getDeliveryShift()
+    orders: table.getCheckedOrderIds()
+    truck: @pageStructure.getTruck()
     }
 
-  reorderOrdersRequest: (order, oldPos, newPos)->
-    {order_id: order, old_position: oldPos, new_position: newPos}
+  splitOrderRequest: (orderId, newQuantity, newVolume) ->
+    {orderId: orderId, new_quantity: newQuantity, new_volume: newVolume}
 
-class SubmitRequest
-  cosntructor: (@delivery_date, @delivery_shift, @orders) ->
+  reorderOrdersRequest: (orderId, oldPos, newPos)->
+    {orderId: orderId, old_position: oldPos, new_position: newPos}
 
-class LoadView
-  setPageStructure: (@page_structure)->
 
-  init_defaults: ->
-
-  get_current_date: ->
-    new Date().ddmmyyyy()
 
 $(document).on "page:change", ->
   $('#delivery_date_input').datepicker()
 
+  loadController = new LoadController()
 
-  $('#split_av_order_button').click ->
-    dialog.dialog("open");
+  pageBuilder = new PageStructureBuilder(loadController)
 
-  load_controller = new LoadController()
-
-  page_builder = new PageStructureBuilder(load_controller)
-
-  page_builder.addDeliveryShiftSelect('load_delivery_shift').
+  pageBuilder.addDeliveryShiftSelect('load_delivery_shift').
   addTruckVolumeLabel('truck_volume').
   addDeliveryDateInput('delivery_date_input').
   addTruckInput('load_truck').
@@ -406,6 +532,8 @@ $(document).on "page:change", ->
   addReturnOrdersListener('return_orders_button').
   addCompleteLoadListener('complete_load_button').
   addLoadStatusLabel('load_status_value').
-  addSplitOrderDialog('split_order_dialog')
+  addSplitOrderDialog('split_order_dialog').
+  addSplitAvOrderButton('split_av_order_button').
+  addSplitPlanOrderButton('split_plan_order_button')
 
 

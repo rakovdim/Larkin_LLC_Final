@@ -1,0 +1,2 @@
+class SplitOrderException < BusinessException
+end

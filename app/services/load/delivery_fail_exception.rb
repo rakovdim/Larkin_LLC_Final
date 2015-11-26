@@ -1,0 +1,2 @@
+class DeliveryFailException < LoadConstructingException
+end
