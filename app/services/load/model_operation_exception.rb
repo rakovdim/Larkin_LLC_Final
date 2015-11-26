@@ -1,0 +1,2 @@
+class ModelOperationException < BusinessException
+end

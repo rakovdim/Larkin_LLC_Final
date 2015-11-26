@@ -58,6 +58,10 @@ class OrderRelease < ActiveRecord::Base
     OrderRelease.statuses.to_a[0][0]
   end
 
+  def self.planned_status
+    OrderRelease.statuses.to_a[1][0]
+  end
+
   private
   def get_delivery_type
     unless origin_name.nil?

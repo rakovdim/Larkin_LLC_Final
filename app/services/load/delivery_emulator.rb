@@ -39,7 +39,7 @@ class DeliveryEmulator
 
   def validate_truck_overload(order)
     if @in_truck_orders_volume > @truck_capacity
-      raise DeliveryFailException.new ('Not enough capacity in load because of order: '+order.purchase_order_number)
+      raise DeliveryEmulationException.new ('Not enough capacity in load because of order: '+order.purchase_order_number)
     end
   end
 end

@@ -10,7 +10,7 @@ Rails.application.routes.draw do
   post 'save_orders' => 'order_releases#save_orders'
 
   get 'get_available_orders' => 'loads#get_available_orders'
-  get 'get_planning_orders' => 'loads#get_planning_orders'
+  get 'get_load_data' => 'loads#get_load_data'
   post 'submit_orders' => 'loads#submit_orders'
   post 'return_orders' => 'loads#return_orders'
   post 'reorder_planning_orders' => 'loads#reorder_planning_orders'

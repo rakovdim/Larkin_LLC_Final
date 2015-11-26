@@ -3,22 +3,27 @@ ActiveRecord::Import.require_adapter('postgresql')
 
 class OrderReleaseService
 
+  def initialize
+    @model_validator = ModelValidator.new
+  end
+
   def split_order(split_order_request)
     TxUtils.execute_transacted_action(lambda {
       order_release = OrderRelease.find(split_order_request.order_id)
 
-      LoadConstructionValidator.new.validate_order_not_planned(order_release)
-      raise SplitOrderException.new ("Can't split order #{order_release.purchase_order_number}. Not enough quantity") if order_release.handling_unit_quantity <= split_order_request.new_quantity
-      raise SplitOrderException.new ("Can't split order #{order_release.purchase_order_number}. Not enough volume") if order_release.volume <= split_order_request.new_volume
+      new_volume = split_order_request.new_volume
+      new_quantity = split_order_request.new_quantity
 
-      remaining_order_release = perform_splitting(order_release, split_order_request.new_volume, split_order_request.new_quantity)
+      @model_validator.validate_order_for_splitting(order_release, new_volume, new_quantity)
+
+      remaining_order_release = perform_splitting(order_release, new_volume, new_quantity)
 
       order_release.save!
       remaining_order_release.save!
     })
   end
 
-  def collect_planning_orders (orders_request)
+  def get_load_data (orders_request)
     TxUtils.execute_transacted_action(lambda {
       load = LoadService.new.get_load_by_date_and_shift orders_request.delivery_date,
                                                         orders_request.delivery_shift
@@ -41,7 +46,7 @@ class OrderReleaseService
   end
 
   #todo refactor
-  def collect_available_orders (orders_request)
+  def get_available_orders (orders_request)
     TxUtils.execute_transacted_action(lambda {
       where_query_for_orders = where_query_for_orders(orders_request.delivery_date, orders_request.delivery_shift)
       found_orders = where_query_for_orders.select(orders_request.required_columns).offset(orders_request.start).limit(orders_request.length)

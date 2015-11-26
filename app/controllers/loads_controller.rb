@@ -1,6 +1,6 @@
 class LoadsController < ApplicationController
   def index
-    authorize_operation! :index
+    authorize_operation! :load_planning
     current_load_response = LoadService.new.get_current_load
     @trucks = current_load_response.all_trucks
     @load = current_load_response.load
@@ -17,7 +17,6 @@ class LoadsController < ApplicationController
       LoadService.new.update_load_data(request) })
   end
 
-  #todo how warning
   def return_orders
     process_update_load_request(submit_return_orders_request, lambda { |return_request|
       LoadService.new.return_orders(return_request)
@@ -44,19 +43,19 @@ class LoadsController < ApplicationController
       LoadService.new.reopen_load(request) })
   end
 
-  def get_planning_orders
-    process_collect_orders_request(lambda { |request|
-      OrderReleaseService.new.collect_planning_orders (request) })
+  def get_load_data
+    process_collect_data_request(lambda { |request|
+      OrderReleaseService.new.get_load_data (request) })
   end
 
   def get_available_orders
-    process_collect_orders_request(lambda { |request|
-      OrderReleaseService.new.collect_available_orders (request) })
+    process_collect_data_request(lambda { |request|
+      OrderReleaseService.new.get_available_orders (request) })
   end
 
   private
 
-  def process_collect_orders_request (processing_action)
+  def process_collect_data_request (processing_action)
     authorize_operation! :load_planning
     orders_response = processing_action.call(collect_orders_request)
     orders_response.set_draw params[:draw].to_i
@@ -68,8 +67,10 @@ class LoadsController < ApplicationController
     begin
       processing_action.call(request)
       data = process_success_response
-    rescue LoadConstructingException => e
+    rescue BusinessException => e
       data = {:status => 'fail', :message => e.message}
+    rescue WarningException => e
+      data = {:status => 'warning', :message => e.message}
     end
 
     send_json_response(data)

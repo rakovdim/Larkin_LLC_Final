@@ -1,21 +1,14 @@
 class LoadService
   def initialize
-    @load_validator = LoadConstructionValidator.new
+    @model_validator = ModelValidator.new
   end
 
-  def update_load_data(update_request)
-    execute_transacted_action (lambda {
-      load = get_load_by_date_and_shift(update_request.delivery_date, update_request.delivery_shift)
-      return if load == nil
-      @load_validator.validate_load_not_planned(load)
-      process_update_load_request(load, update_request)
-      load.save!
-    })
-  end
-
-  #todo fix kamaz. trucks should be loaded here
+  # Method returns load for current date and morning shift
+  # If load doesn't exist then fake object is created
+  # It is used for initial data presentation
+  # Method also returns all trucks in the system
   def get_current_load
-    execute_transacted_action(lambda {
+    TxUtils.execute_transacted_action(lambda {
       delivery_date = Date.today - 1.year
       delivery_shift = Load.delivery_shifts[:morning]
       load = get_or_create_load(delivery_date, delivery_shift)
@@ -25,68 +18,113 @@ class LoadService
     })
   end
 
+  # Updates truck for load if load is not planned for delivery
+  def update_load_data(update_request)
+    TxUtils.execute_transacted_action (lambda {
+      load = get_load_by_date_and_shift(update_request.delivery_date, update_request.delivery_shift)
+      return if load == nil
+      @model_validator.validate_object_not_planned(load)
+      perform_load_update(load, update_request)
+      load.save!
+    })
+  end
+
+  # Finds load by delivery_date and delivery_shift
+  # Returns nil if load was not found
   def get_load_by_date_and_shift(delivery_date, delivery_shift)
     Load.where('delivery_date=? and delivery_shift=?', delivery_date, delivery_shift).first
   end
 
+  # Reopens requested load switching it and its orders in Not Planning state
+  # Operation is applicable only for Planned for Delivery loads
   def reopen_load (date_shift_request)
-
-  end
-
-  def complete_load (date_shift_request)
-    execute_transacted_action (lambda {
+    TxUtils.execute_transacted_action (lambda {
       load = get_load_by_date_and_shift(date_shift_request.delivery_date, date_shift_request.delivery_shift)
-      puts load.id
-      @load_validator.validate_load_not_planned(load)
-      load.order_releases.each do |order_release|
-        @load_validator.validate_order_not_planned(order_release)
-        order_release.planned_for_delivery!
-      end
-      DeliveryEmulator.new(load).perform_dryrun_delivery
-      load.planned_for_delivery!
-      load.save! })
+      @model_validator.validate_object_planned(load)
+      perform_load_status_change(load, OrderRelease.not_planned_status)
+      load.save!
+    })
   end
 
+  # Completes requested load switching it and its orders in Planned for Delivery state
+  # Operation is applicable only for Not Planned loads
+  # In the end of transition performs delivery emulation
+  # If emulation is unsuccessful then Exception is raised
+  # Note that exception does rollback current tx
+  def complete_load (date_shift_request)
+    TxUtils.execute_transacted_action (lambda {
+      load = get_load_by_date_and_shift(date_shift_request.delivery_date, date_shift_request.delivery_shift)
+      @model_validator.validate_object_not_planned(load)
+      perform_load_status_change(load, OrderRelease.planned_status)
+      DeliveryEmulator.new(load).perform_dryrun_delivery
+      load.save!
+    })
+  end
+
+  # Deletes requested orders from load and make them available for further planning
+  # If load is not in Not_Planning state, then exception is raised
   def return_orders(return_request)
     perform_submit_return_orders(return_request, lambda { |load, order_ids|
       delete_orders_from_load(load, order_ids) })
   end
 
-  #todo I have no guaranty that orders are loaded in order according to ids order
+  # Submits requested orders to load
+  # Following validation steps are performed before addition:
+  #  1) Ensure that load has not been planned already
+  #  2) Ensure that load delivery date and shift correspond to load date and shift
+  #  3) Ensure that order has not been added to any load already
+  # If validations pass then requested orders are added to load 
+  # Finally delivery emulation is performed. If emulation is unsuccessful then warning is raised
+  # Note that warning doesn't rollback current transaction
   def submit_orders (submit_request)
-    perform_submit_return_orders(submit_request, lambda { |load, order_ids|
+    load = perform_submit_return_orders(submit_request, lambda { |load, order_ids|
       new_orders = OrderRelease.find (order_ids)
       add_orders_to_load(load, new_orders)
     })
+    emulate_delivery_with_warning(load)
   end
 
-  def perform_submit_return_orders(request, submit_return_action)
-    execute_transacted_action(lambda {
-      load = get_or_create_load(request.delivery_date, request.delivery_shift)
-      @load_validator.validate_load_not_planned(load)
-      process_update_load_request(load, request)
-      submit_return_action.call(load, request.order_ids)
-      apply_ordering(load)
-      #DeliveryEmulator.new(load).perform_dryrun_delivery
-      load.save!
-    })
-  end
-
+  # Changes position of requested order in load according to old_position and new_position
+  # If no load can't be found for this order then internal exception is raised
+  # Validates that load has not been already planned
+  # Finally method changes position of order and performs delivery emulation of entire load
+  # If emulation is unsuccessful then warning is raised (doesn't rollback tx)
   def reorder_planning_orders (reordering_request)
-    execute_transacted_action(lambda {
+    load = TxUtils.execute_transacted_action(lambda {
       old_pos = reordering_request.old_position
       new_pos = reordering_request.new_position
       load = Load.find_by_order_id(reordering_request.order_id)
-      raise InternalLoadConstructingException.new ('load is nil for order: '+reordering_request.order_id) if load==nil
-      @load_validator.validate_load_not_planned(load)
+      raise InternalModelOperationException.new ('load is nil for order: '+reordering_request.order_id) if load==nil
+      @model_validator.validate_object_not_planned(load)
       move_order_to_new_position(load, old_pos, new_pos)
-      # DeliveryEmulator.new(load).perform_dryrun_delivery
-      load.save! })
+      load.save!
+      load })
+    #todo sort orders
+    emulate_delivery_with_warning(load)
   end
 
   private
 
-  def process_update_load_request (load, update_request)
+  def perform_load_status_change(load, status)
+    load.order_releases.each do |order_release|
+      order_release.status = status
+    end
+    load.status = status
+  end
+
+  def perform_submit_return_orders(request, submit_return_action)
+    TxUtils.execute_transacted_action(lambda {
+      load = get_or_create_load(request.delivery_date, request.delivery_shift)
+      @model_validator.validate_object_not_planned(load)
+      perform_load_update(load, request)
+      submit_return_action.call(load, request.order_ids)
+      apply_ordering(load)
+      load.save!
+      load
+    })
+  end
+
+  def perform_load_update (load, update_request)
     if load.truck==nil || load.truck.id != update_request.truck_id
       load.truck = Truck.find(update_request.truck_id)
     end
@@ -106,7 +144,7 @@ class LoadService
 
   def add_orders_to_load(load, new_orders)
     new_orders.each do |order|
-      @load_validator.validate_order(order, load)
+      @model_validator.validate_order_for_load(order, load)
       load.order_releases << order
     end
   end
@@ -121,15 +159,6 @@ class LoadService
     end
   end
 
-  #todo may be do it in the first cycle
-  #todo get last order_number and continue
-  def apply_ordering (load)
-    order = 0
-    load.order_releases.each do |order_release|
-      order_release.stop_order_number = order
-      order = order+1
-    end
-  end
 
   def get_or_create_load(delivery_date, delivery_shift)
     load = get_load_by_date_and_shift delivery_date, delivery_shift
@@ -147,9 +176,21 @@ class LoadService
     result
   end
 
-  def execute_transacted_action (callback)
-    ActiveRecord::Base.transaction do
-      callback.call
+  #todo may be do it in the first cycle
+  #todo get last order_number and continue
+  def apply_ordering (load)
+    order = 0
+    load.order_releases.each do |order_release|
+      order_release.stop_order_number = order
+      order = order+1
+    end
+  end
+
+  def emulate_delivery_with_warning (load)
+    begin
+      DeliveryEmulator.new(load).perform_dryrun_delivery
+    rescue DeliveryEmulationException => e
+      raise WarningException.new (e.message)
     end
   end
 

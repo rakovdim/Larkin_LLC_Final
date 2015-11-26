@@ -29,9 +29,9 @@
           <tr>
             <td><%= link_to order_release.purchase_order_number, order_release %></td>
             <td><%= order_release.delivery_date %></td>
-            <td><%= order_release.delivery_shift %></td>
-            <td><%= order_release.status %></td>
-            <td><%= order_release.delivery_type %></td>
+            <td><%= order_release.delivery_shift.humanize %></td>
+            <td><%= order_release.status.humanize %></td>
+            <td><%= order_release.delivery_type.humanize %></td>
             <td><%= order_release.origin_city << ' ' << order_release.origin_raw_line_1 %></td>
             <td><%= order_release.destination_city << ' ' << order_release.destination_raw_line_1 %></td>
             <td><%= order_release.phone_number %></td>

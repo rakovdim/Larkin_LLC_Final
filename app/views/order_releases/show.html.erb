@@ -4,7 +4,7 @@
     <%= link_to "Edit", edit_order_release_path(@order_release) %>
     <%= link_to "Back", order_releases_path %>
   </div>
-    <div class="row"><h3>Parameters</h3></div>
+  <div class="row"><h3>Parameters</h3></div>
   <div class="row">
     <div class="col-sm-6">
       <label>Purchase Order Number</label>
@@ -12,9 +12,9 @@
       <div class="order-value"><%= @order_release.purchase_order_number %></div>
     </div>
     <div class="col-sm-6">
-      <label>Handling Unit Type</label>
+      <label>Delivery Status</label>
 
-      <div class="order-value"> <%= @order_release.handling_unit_type %></div>
+      <div class="order-value"><%= @order_release.status.humanize %></div>
     </div>
   </div>
   <div class="row">
@@ -47,6 +47,12 @@
 
       <div class="order-value"><%= @order_release.mode %></div>
     </div>
+    <div class="col-sm-6">
+      <label>Handling Unit Type</label>
+
+      <div class="order-value"> <%= @order_release.handling_unit_type %></div>
+    </div>
+
   </div>
   <div class="row"><h4>Destination Info</h4></div>
   <div class="row">

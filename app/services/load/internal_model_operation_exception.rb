@@ -1,0 +1,2 @@
+class InternalModelOperationException < Exception
+end

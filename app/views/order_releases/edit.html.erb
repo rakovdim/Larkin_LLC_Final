@@ -9,8 +9,8 @@
           <div class="order-value"><%= f.text_field :purchase_order_number, class: 'form-control' %></div>
         </div>
         <div class="col-sm-6">
-          <%= f.label 'Handling Unit Type' %>
-          <div class="order-value"> <%= f.select :handling_unit_type, OrderRelease.handling_unit_types.keys, class: 'form-control' %></div>
+          <%= f.label 'Delivery Status' %>
+          <div class="order-value"><%= @order_release.status.humanize %></div>
         </div>
       </div>
       <div class="row">
@@ -40,12 +40,16 @@
           <%= f.label 'Mode' %>
           <div class="order-value">  <%= f.select :mode, OrderRelease.modes.keys, class: 'form-control' %></div>
         </div>
+        <div class="col-sm-6">
+          <%= f.label 'Handling Unit Type' %>
+          <div class="order-value"> <%= f.select :handling_unit_type, OrderRelease.handling_unit_types.keys, class: 'form-control' %></div>
+        </div>
       </div>
       <div class="row"><h4>Destination Info</h4></div>
       <div class="row">
         <div class="col-sm-6">
           <%= f.label 'Destination Name' %>
-          <div class="order-value"> <%=   f.text_field :destination_name, class: 'form-control' %></div>
+          <div class="order-value"> <%= f.text_field :destination_name, class: 'form-control' %></div>
         </div>
         <div class="col-sm-6">
           <%= f.label 'Destination City' %>
@@ -112,6 +116,7 @@
       </div>
       <div class="row">
         <%= f.submit "Save changes", class: "btn btn-primary" %>
+        <%= link_to "Cancel", :back %>
       </div>
   <% end %>
 </div>

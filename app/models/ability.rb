@@ -36,11 +36,7 @@ class Ability
     can :update, OrderRelease if user.has_role? 'dispatcher'
     can :upload, OrderRelease if user.has_role? 'dispatcher'
     can :save_orders, OrderRelease if user.has_role? 'dispatcher'
-    can :index, Load if user.has_role? 'dispatcher'
-    can :get_available_orders, Load if user.has_role? 'dispatcher'
-    can :get_planning_orders, Load if user.has_role? 'dispatcher'
     can :update_orders, Load if user.has_role? 'dispatcher'
-    can :complete_load, Load if user.has_role? 'dispatcher'
     can :load_planning, Load if user.has_role? 'dispatcher'
 
     can :list, :all if user.has_role? 'driver'

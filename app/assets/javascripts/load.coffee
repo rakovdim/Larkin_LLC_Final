@@ -15,19 +15,21 @@ class PageStructureBuilder
     this
 
   addSplitAvOrderButton: (buttonId) ->
-    @pageStructure.setSplitAvOrderButtonId(buttonId)
+    button = $('#' + buttonId)
+    @pageStructure.setSplitAvOrderButton(button)
     table = @pageStructure.availableOrdersTable
-    this.addSplitOrderButton(buttonId, table)
+    this.addSplitOrderButton(button, table)
     this
 
   addSplitPlanOrderButton: (buttonId) ->
-    @pageStructure.setSplitPlanOrderButtonId(buttonId)
+    button = $('#' + buttonId)
+    @pageStructure.setSplitPlanOrderButton(button)
     table = @pageStructure.planningOrdersTable
-    this.addSplitOrderButton(buttonId, table)
+    this.addSplitOrderButton(button, table)
     this
 
-  addSplitOrderButton: (buttonId, table) ->
-    $('#' + buttonId).click =>
+  addSplitOrderButton: (button, table) ->
+    button.click =>
       @loadController.openSplitOrderDialog(table)
 
   addLoadStatusLabel: (loadStatusLabelId) ->
@@ -35,20 +37,23 @@ class PageStructureBuilder
     this
 
   addSubmitOrdersButton: (buttonId)->
-    @pageStructure.setSubmitButtonId(buttonId)
-    $('#' + buttonId).click =>
+    button = $('#' + buttonId)
+    @pageStructure.setSubmitButton(button)
+    button.click =>
       @loadController.submitOrders()
     this
 
   addCompleteLoadButton: (buttonId)->
-    @pageStructure.setCompleteLoadButtonId(buttonId)
-    $('#' + buttonId).click =>
+    button = $('#' + buttonId)
+    @pageStructure.setCompleteLoadButton(button)
+    button.click =>
       @loadController.completeLoad()
     this
 
   addReturnOrdersButton: (buttonId)->
-    @pageStructure.setReturnButtonId(buttonId)
-    $('#' + buttonId).click =>
+    button = $('#' + buttonId)
+    @pageStructure.setReturnButton(button)
+    button.click =>
       @loadController.returnOrders()
     this
 
@@ -83,7 +88,7 @@ class PageStructureBuilder
 
   addPlanningOrdersTable: (tableId)->
     if !Table.isDataTableInit(tableId)
-      planOrdersTable = this.constructEntireTable(tableId, '/get_planning_orders', 'plan_orders_checkbox', false, true)
+      planOrdersTable = this.constructEntireTable(tableId, '/get_load_data', 'plan_orders_checkbox', false, true)
       this.addRowReorderListener(planOrdersTable).addRefreshTableListener(planOrdersTable)
       @pageStructure.setPlanningOrdersTable(planOrdersTable)
     this
@@ -124,7 +129,7 @@ class PageStructureBuilder
     table.setAllOrdersCheckbox(Checkbox.createAllOrdersCheckbox(allOrdersCheckboxId))
     commonData = {
       scrollY: '400px'
-      processing: true
+      processing: false
       serverSide: true
       ordering: false
       pageLength: 10
@@ -337,13 +342,13 @@ class PageStructure
   setTruckSelect: (@truckSelect)->
   setTruckVolumeLabelId: (@truckLoadVolumeId)->
   setLoadStatusLabelId: (@loadStatusLabelId)->
-  setSubmitButtonId: (@submitButtonId)->
-  setReturnButtonId: (@returnButtonId)->
-  setCompleteLoadButtonId: (@completeLoadButtonId)->
-  setSplitAvOrderButtonId: (@splitAvOrderButtonId)->
-  setSplitPlanOrderButtonId: (@splitPlanOrderButtonId)->
+  setSubmitButton: (@submitButton)->
+  setReturnButton: (@returnButton)->
+  setCompleteLoadButton: (@completeLoadButton)->
+  setSplitAvOrderButton: (@splitAvOrderButton)->
+  setSplitPlanOrderButton: (@splitPlanOrderButton)->
   setSplitOrderDialog: (@splitOrderDialog)->
-  setReopenLoadButton: (@setReopenLoadButton)->
+  setReopenLoadButton: (@reopenLoadButton)->
 
   isAlreadyInit: ->
     this.isTableInit(@planningOrdersTable)
@@ -370,17 +375,17 @@ class PageStructure
   setLoadStatus: (loadStatus) ->
     $('#' + @loadStatusLabelId).text(loadStatus);
     if (loadStatus != 'Not planned')
-      this.setPageDisabled(true)
+      this.setPagePlanned(true)
     else
-      this.setPageDisabled(false)
+      this.setPagePlanned(false)
 
-  setPageDisabled: (disabled)->
-    console.log(@splitPlanOrderButtonId)
+  setPagePlanned: (disabled)->
     @truckSelect.prop('disabled', disabled)
-    $('#' + @submitButtonId).prop('disabled', disabled)
-    $('#' + @returnButtonId).prop('disabled', disabled)
-    $('#' + @completeLoadButtonId).prop('disabled', disabled)
-    $('#' + @splitPlanOrderButtonId).prop('disabled', disabled)
+    @submitButton.prop('disabled', disabled)
+    @returnButton.prop('disabled', disabled)
+    @completeLoadButton.prop('disabled', disabled)
+    @splitPlanOrderButton.prop('disabled', disabled)
+    @reopenLoadButton.prop('disabled', !disabled)
 
   updatePageData: (pageData)->
     if (pageData != null && pageData != undefined)
@@ -493,7 +498,10 @@ class LoadController
     if (data.status == 'success')
       this.onUpdateSuccess(data, successMessage)
     else
-      this.onUpdateFail(data)
+      if (data.status == 'warning')
+        this.onUpdateWarning(data)
+      else
+        this.onUpdateFail(data)
 
   onUpdateSuccess: (data, successMessage) ->
     if (successMessage != undefined )
@@ -501,6 +509,7 @@ class LoadController
     @pageStructure.reloadTables(true)
 
   onUpdateFail: (data) ->
+    console.log ('called')
     alert('Exception occurs: ' + data.message)
 
   onUpdateWarning: (data) ->
