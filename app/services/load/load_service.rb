@@ -34,7 +34,7 @@ class LoadService
       load = get_load_by_date_and_shift(update_request.delivery_date, update_request.delivery_shift)
       return if load == nil
       @model_validator.validate_object_not_planned(load)
-      perform_load_update(load, update_request)
+      perform_load_data_update(load, update_request)
       load.save!
     })
   end
@@ -126,7 +126,7 @@ class LoadService
     TxUtils.execute_transacted_action(lambda {
       load = get_or_create_load(request.delivery_date, request.delivery_shift)
       @model_validator.validate_object_not_planned(load)
-      perform_load_update(load, request)
+      perform_load_data_update(load, request)
       submit_return_action.call(load, request.order_ids)
       apply_ordering(load)
       load.save!
@@ -134,7 +134,7 @@ class LoadService
     })
   end
 
-  def perform_load_update (load, update_request)
+  def perform_load_data_update (load, update_request)
     if load.truck==nil || load.truck.id != update_request.truck_id
       load.truck = Truck.find(update_request.truck_id)
     end
@@ -144,7 +144,7 @@ class LoadService
     orders = []
     orders.concat(load.order_releases)
     orders.insert(new_pos, orders.delete_at(old_pos))
-    orders_map = get_orders_map(load)
+    orders_map = get_orders_as_map(load)
     orders.each_with_index do |order_release, index|
       orders_map[order_release.id].stop_order_number = index
     end
@@ -176,7 +176,7 @@ class LoadService
     load
   end
 
-  def get_orders_map(load)
+  def get_orders_as_map(load)
     result = {}
     load.order_releases.each do |order|
       result[order.id]=order

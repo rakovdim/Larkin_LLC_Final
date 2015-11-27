@@ -3,6 +3,8 @@ class DeliveryEmulator
     @load=load
     @truck_capacity = load.truck.max_capacity
     @in_truck_orders_volume = 0
+    #todo step can be optimized because sorting is need only in case of reordering now
+    @sorted_by_stops_orders = sort_orders_by_stop_number(load)
   end
 
   def perform_dryrun_delivery
@@ -14,17 +16,16 @@ class DeliveryEmulator
 
   private
   def perform_dryrun_orders_loading
-    @load.order_releases.each do |order|
+    @sorted_by_stops_orders.each do |order|
       @in_truck_orders_volume = @in_truck_orders_volume+order.volume if order.delivery?
       validate_truck_overload(order)
     end
   end
 
   def perform_dryrun_orders_delivery
-    @load.order_releases.each do |order|
-      puts "try to deliver order: #{order.purchase_order_number}, truck volume: #{@in_truck_orders_volume}"
+    @sorted_by_stops_orders.each do |order|
+      puts "try to deliver order: #{order.purchase_order_number}, truck volume: #{@in_truck_orders_volume}, stop order number: #{order.stop_order_number}"
       perform_delivery_step(order)
-      #validate_truck_overload(order)
     end
   end
 
@@ -41,5 +42,11 @@ class DeliveryEmulator
     if @in_truck_orders_volume > @truck_capacity
       raise DeliveryEmulationException.new ('Not enough capacity in load because of order: '+order.purchase_order_number)
     end
+  end
+
+  def sort_orders_by_stop_number(load)
+    sorted_by_stops_orders = []
+    sorted_by_stops_orders.concat(load.order_releases)
+    sorted_by_stops_orders.sort { |a, b| a.stop_order_number <=> b.stop_order_number }
   end
 end
