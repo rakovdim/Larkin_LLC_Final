@@ -11,7 +11,12 @@
  * file per style scope.
  *
  *= require jquery-ui
- *= require_tree .
- *= require_self
-
  */
+@import "bootstrap-sprockets";
+@import "bootstrap";
+@import "custom";
+@import "load";
+@import "order_release";
+@import "datatables.min-2";
+@import "bootstrap-dialog";
+@import "mindmup-editabletable";

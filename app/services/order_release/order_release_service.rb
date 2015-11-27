@@ -51,13 +51,14 @@ class OrderReleaseService
   end
 
   # Saves collection of orders bulk. Based on incoming orders params
+  # Method makes an assumption that data types and format are valid for order_release
   # All valid orders are stored in one SQL Batch to DB
   # All invalid orders are returned for further fixes
   def save_orders_bulk (orders_params_array)
     valid_orders = []
     invalid_orders = []
     orders_params_array.each do |params|
-      order_release = OrderRelease.new params
+      order_release = OrderReleaseFactory.new.create_order_release(params)
       if order_release.valid?
         valid_orders << order_release
       else
@@ -67,7 +68,7 @@ class OrderReleaseService
     process_valid_invalid_orders valid_orders, invalid_orders
   end
 
-  private
+    private
 
   def process_valid_invalid_orders (valid_orders, invalid_orders)
 
@@ -76,7 +77,7 @@ class OrderReleaseService
     if invalid_orders.empty?
       OrdersUploadResponse.success
     else
-      OrdersUploadResponse.fails invalid_orders
+      OrdersUploadResponse.fail(invalid_orders)
     end
   end
 

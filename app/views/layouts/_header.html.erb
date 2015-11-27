@@ -3,10 +3,20 @@
     <%= link_to "Larkin LLC", root_path, id: "logo" %>
     <nav>
       <% if logged_in? %>
+
           <ul class="nav navbar-nav navbar-right">
             <li><%= link_to "Logout from "+ current_user.login, logout_path, method: :delete %></li>
           </ul>
           </nav>
       <% end %>
+      <% if can? :order_management, OrderRelease %>
+          <div id="tabs">
+            <ul>
+              <li><a href="/order_releases">Order Management</a></li>
+              <li><a href="/load_planning">Load Planning</a></li>
+            </ul>
+          </div>
+      <% end %>
       </div>
+
 </header>

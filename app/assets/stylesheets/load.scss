@@ -2,8 +2,8 @@
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
-.available_order_table, .planning_orders_table {
-  word-wrap: break-word;
+.available_order_table, .planning_orders_table, #orders_delivery_table {
+  //word-wrap: break-word;
   text-align: center;
   font-size: 10px;
   td th {
@@ -16,6 +16,8 @@
   }
 }
 
+div.dataTables_scrollHeadInner table { margin-bottom: 0 !important }
+
 .dataTables_paginate, .dataTables_info, .dataTables_length {
   font-size: 10px;
 
@@ -25,7 +27,7 @@
   text-align: center;
 }
 
-.load_planning {
+.load_management {
   font-size: 12px;
 }
 

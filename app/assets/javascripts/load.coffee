@@ -129,10 +129,11 @@ class PageStructureBuilder
     table.setAllOrdersCheckbox(Checkbox.createAllOrdersCheckbox(allOrdersCheckboxId))
     commonData = {
       scrollY: '400px'
+      scrollX: false
       processing: false
       serverSide: true
       ordering: false
-      pageLength: 10
+      pageLength: 12
       bPaginate: paging
       bInfo: paging
       bLengthChange: false
@@ -167,8 +168,9 @@ class PageStructureBuilder
         {data: "delivery_type"}
         {data: "volume"}
         {data: "handling_unit_quantity"}
+        {data: "origin_raw_line_1"}
         {data: "destination_raw_line_1"}
-        {data: "origin_raw_line_1"}]
+      ]
     }
     if (dnd)
       commonData['rowReorder'] = {selector: 'tr td:not(:first-child)'}
@@ -550,25 +552,26 @@ class LoadController
 
 
 $(document).on "page:change", ->
-  $('#delivery_date_input').datepicker()
+  if (top.location.pathname == '/load_planning')
+    $('#delivery_date_input').datepicker()
 
-  loadController = new LoadController()
+    loadController = new LoadController()
 
-  pageBuilder = new PageStructureBuilder(loadController)
+    pageBuilder = new PageStructureBuilder(loadController)
 
-  pageBuilder.addDeliveryShiftSelect('load_delivery_shift').
-  addTruckVolumeLabel('truck_volume').
-  addDeliveryDateInput('delivery_date_input').
-  addTruckSelect('load_truck').
-  addAvailableOrdersTable('available_orders').
-  addPlanningOrdersTable('planning_orders').
-  addSubmitOrdersButton('submit_orders_button').
-  addReturnOrdersButton('return_orders_button').
-  addCompleteLoadButton('complete_load_button').
-  addLoadStatusLabel('load_status_value').
-  addSplitOrderDialog('split_order_dialog').
-  addSplitAvOrderButton('split_av_order_button').
-  addSplitPlanOrderButton('split_plan_order_button').
-  addReopenLoadButton('reopen_load_button')
+    pageBuilder.addDeliveryShiftSelect('load_delivery_shift').
+    addTruckVolumeLabel('truck_volume').
+    addDeliveryDateInput('delivery_date_input').
+    addTruckSelect('load_truck').
+    addAvailableOrdersTable('available_orders').
+    addPlanningOrdersTable('planning_orders').
+    addSubmitOrdersButton('submit_orders_button').
+    addReturnOrdersButton('return_orders_button').
+    addCompleteLoadButton('complete_load_button').
+    addLoadStatusLabel('load_status_value').
+    addSplitOrderDialog('split_order_dialog').
+    addSplitAvOrderButton('split_av_order_button').
+    addSplitPlanOrderButton('split_plan_order_button').
+    addReopenLoadButton('reopen_load_button')
 
 

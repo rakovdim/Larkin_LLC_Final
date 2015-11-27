@@ -10,7 +10,7 @@ class OrdersUploadResponse
     OrdersUploadResponse.new(true)
   end
 
-  def self.fails (invalid_orders)
+  def self.fail (invalid_orders)
     OrdersUploadResponse.new(false, invalid_orders)
   end
 end

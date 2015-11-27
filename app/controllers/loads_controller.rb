@@ -1,4 +1,4 @@
-class LoadsController < ApplicationController
+class LoadsController < BaseLoadController
   def index
     authorize_operation! :load_planning
     current_load_response = LoadService.new.get_current_load
@@ -76,16 +76,6 @@ class LoadsController < ApplicationController
     send_json_response(data)
   end
 
-  def send_json_response (json_response)
-    respond_to do |format|
-      puts json_response
-      format.json { render :json => json_response }
-    end
-  end
-
-  def date_shift_request
-    DateShiftRequest.new(get_request_date, get_request_shift)
-  end
 
   def collect_orders_request
     OrdersCollectingRequest.new(required_columns, params.require(:start), params.require(:length), get_request_date, get_request_shift)
@@ -139,11 +129,5 @@ class LoadsController < ApplicationController
      :volume, :handling_unit_quantity]
   end
 
-  def get_request_date
-    Date.strptime(params.require(:delivery_date), "%m/%d/%Y")
-  end
 
-  def get_request_shift
-    Load.delivery_shifts[params.require(:delivery_shift)]
-  end
 end

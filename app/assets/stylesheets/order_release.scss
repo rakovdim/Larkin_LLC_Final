@@ -2,3 +2,16 @@
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
+#order_releases_upload, #order_releases_list{
+  word-wrap: break-word;
+  text-align: center;
+  font-size: 12px;
+  td th {
+    text-align: center;
+  }
+  tbody {
+    tr {
+      height: 30px; /* or whatever height you need to make them all consistent */
+    }
+  }
+}

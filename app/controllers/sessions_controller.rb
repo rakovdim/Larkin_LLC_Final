@@ -41,7 +41,7 @@ class SessionsController < ApplicationController
       if current_user.has_role? 'dispatcher'
         redirect_to order_releases_path
       else
-        redirect_to loads_delivery_path
+        redirect_to orders_delivery_path
       end
     else
       redirect_to login_path

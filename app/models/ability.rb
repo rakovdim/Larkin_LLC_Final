@@ -30,17 +30,9 @@ class Ability
     # https://github.com/CanCanCommunity/cancancan/wiki/Defining-Abilities
 
     return if user.nil?
-    can :index, OrderRelease if user.has_role? 'dispatcher'
-    can :show, OrderRelease if user.has_role? 'dispatcher'
-    can :edit, OrderRelease if user.has_role? 'dispatcher'
-    can :update, OrderRelease if user.has_role? 'dispatcher'
-    can :upload, OrderRelease if user.has_role? 'dispatcher'
-    can :save_orders, OrderRelease if user.has_role? 'dispatcher'
-    can :update_orders, Load if user.has_role? 'dispatcher'
+    can :order_management, OrderRelease if user.has_role? 'dispatcher'
     can :load_planning, Load if user.has_role? 'dispatcher'
-
-    can :list, :all if user.has_role? 'driver'
-    #can :list, :User if user.has_role 'driver'
+    can :orders_delivery, Load if user.has_role? 'driver'
 
   end
 end

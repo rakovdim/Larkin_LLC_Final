@@ -1,12 +1,12 @@
 Rails.application.routes.draw do
   root 'sessions#home'
-  get 'sessions/new'
-
-  get 'loads_delivery' => 'loads_delivery#list'
 
   get 'load_planning' => 'loads#index'
+  get 'orders_delivery' => 'orders_delivery#index'
+  get 'get_delivery_data' => 'orders_delivery#get_delivery_data'
 
   resources :order_releases
+
   post 'save_orders' => 'order_releases#save_orders'
 
   get 'get_available_orders' => 'loads#get_available_orders'

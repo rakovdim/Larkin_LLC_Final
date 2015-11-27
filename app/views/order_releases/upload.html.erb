@@ -14,51 +14,51 @@
   <table class='table table-striped table-condensed table-bordered table-hover display center_table' id='order_releases_upload'>
     <thead>
     <tr>
-      <th class="text-centertext-center">purchase_order_number</th>
-      <th class="text-centertext-center">delivery_date</th>
-      <th class="text-centertext-center">delivery_shift</th>
-      <th class="text-centertext-center">origin_name</th>
-      <th class="text-centertext-center">origin_raw_line_1</th>
-      <th class="text-centertext-center">origin_city</th>
-      <th class="text-centertext-center">origin_state</th>
-      <th class="text-centertext-center">origin_zip</th>
-      <th class="text-centertext-center">origin_country</th>
-      <th class="text-centertext-center">client name</th>
-      <th class="text-centertext-center">destination_raw_line_1</th>
-      <th class="text-centertext-center">destination_city</th>
-      <th class="text-centertext-center">destination_state</th>
-      <th class="text-centertext-center">destination_zip</th>
-      <th class="text-centertext-center">destination_country</th>
-      <th class="text-centertext-center">phone_number</th>
-      <th class="text-centertext-center">mode</th>
-      <th class="text-centertext-center">volume</th>
-      <th class="text-centertext-center">handling_unit_quantity</th>
-      <th class="text-centertext-center">handling_unit_type</th>
+      <th>purchase_order_number</th>
+      <th>delivery_date</th>
+      <th>delivery_shift</th>
+      <th>origin_name</th>
+      <th>origin_raw_line_1</th>
+      <th>origin_city</th>
+      <th>origin_state</th>
+      <th>origin_zip</th>
+      <th>origin_country</th>
+      <th>client name</th>
+      <th>destination_raw_line_1</th>
+      <th>destination_city</th>
+      <th>destination_state</th>
+      <th>destination_zip</th>
+      <th>destination_country</th>
+      <th>phone_number</th>
+      <th>mode</th>
+      <th>volume</th>
+      <th>handling_unit_quantity</th>
+      <th>handling_unit_type</th>
     </tr>
     </thead>
     <tbody>
     <% @order_releases.each do |order_release| %>
         <tr>
-          <td class="text-center"><%= order_release.purchase_order_number %></td>
-          <td class="text-center"><%= order_release.delivery_date %></td>
-          <td class="text-center"><%= order_release.delivery_shift %></td>
-          <td class="text-center"><%= order_release.origin_name %></td>
-          <td class="text-center"><%= order_release.origin_raw_line_1 %></td>
-          <td class="text-center"><%= order_release.origin_city %></td>
-          <td class="text-center"><%= order_release.origin_state %></td>
-          <td class="text-center"><%= order_release.origin_zip %></td>
-          <td class="text-center"><%= order_release.origin_country %></td>
-          <td class="text-center"><%= order_release.destination_name %></td>
-          <td class="text-center"><%= order_release.destination_raw_line_1 %></td>
-          <td class="text-center"><%= order_release.destination_city %></td>
-          <td class="text-center"><%= order_release.destination_state %></td>
-          <td class="text-center"><%= order_release.destination_zip %></td>
-          <td class="text-center"><%= order_release.destination_country %></td>
-          <td class="text-center"><%= order_release.phone_number %></td>
-          <td class="text-center"><%= order_release.mode %></td>
-          <td class="text-center"><%= order_release.volume %></td>
-          <td class="text-center"><%= order_release.handling_unit_quantity %></td>
-          <td class="text-center"><%= order_release.handling_unit_type %></td>
+          <td><%= order_release.purchase_order_number %></td>
+          <td><%= order_release.delivery_date %></td>
+          <td><%= order_release.delivery_shift %></td>
+          <td><%= order_release.origin_name %></td>
+          <td><%= order_release.origin_raw_line_1 %></td>
+          <td><%= order_release.origin_city %></td>
+          <td><%= order_release.origin_state %></td>
+          <td><%= order_release.origin_zip %></td>
+          <td><%= order_release.origin_country %></td>
+          <td><%= order_release.destination_name %></td>
+          <td><%= order_release.destination_raw_line_1 %></td>
+          <td><%= order_release.destination_city %></td>
+          <td><%= order_release.destination_state %></td>
+          <td><%= order_release.destination_zip %></td>
+          <td><%= order_release.destination_country %></td>
+          <td><%= order_release.phone_number %></td>
+          <td><%= order_release.mode %></td>
+          <td><%= order_release.volume %></td>
+          <td><%= order_release.handling_unit_quantity %></td>
+          <td><%= order_release.handling_unit_type %></td>
         </tr>
     <% end %>
     </tbody>

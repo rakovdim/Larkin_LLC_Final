@@ -10,8 +10,6 @@ class OrderRelease < ActiveRecord::Base
   belongs_to :load
 
   validates :purchase_order_number, presence: true
-  validates :delivery_date, presence: true
-  validates :delivery_shift, presence: true
   validates :origin_name, presence: true
   validates :origin_raw_line_1, presence: true
   validates :origin_city, presence: true
@@ -24,26 +22,31 @@ class OrderRelease < ActiveRecord::Base
   validates :destination_country, presence: true
   validates :destination_state, presence: true
   validates :destination_zip, presence: true
-  validates :phone_number, presence: true
+  #validates :phone_number
   validates :handling_unit_type, presence: true
-  validates :mode, presence: true
   validates :handling_unit_quantity, presence: true
   validates :volume, presence: true
   validates :status, presence: true
-  validate :validate_origin_dest
+
+  validates :delivery_date, presence: true #, :if => !@custom_errors.nil? && !@custom_errors.has_key?(:delivery_date)
+  validates :delivery_shift, presence: true #, :if => !@custom_errors.nil? && !@custom_errors.has_key?(:delivery_shift)
+  validates :mode, presence: true #, :if => !@custom_errors.nil? && !@custom_errors.has_key?(:mode)
+  validates :handling_unit_type, presence: true #, :if => !@custom_errors.nil? && !@custom_errors.has_key?(:handling_unit_type)
 
   validates :origin_zip, length: {is: 5}, numericality: {only_integer: true, :greater_than => 0}, :if => :origin_zip
   validates :volume, numericality: {only: true, :greater_than_or_equal_to => 0}, :if => :volume
   validates :destination_zip, length: {is: 5}, numericality: {only_integer: true, :greater_than => 0}, :if => :destination_zip
   validates :handling_unit_quantity, numericality: {only_integer: true, :greater_than_or_equal_to => 1}, :if => :handling_unit_quantity
 
+  validate :validate_origin_dest
+  validate :validate_custom_errors
 
-  #todo date format
-  #todo enums
+  def add_custom_validation_error (attribute, error_message)
+    ensure_hash_for_errors
+    @custom_errors[attribute] = error_message
+  end
 
   def as_json(options = {})
-    # just in case someone says as_json(nil) and bypasses
-    # our default...
     result = super(options)
     result[:delivery_type] = delivery_type
     result
@@ -62,6 +65,23 @@ class OrderRelease < ActiveRecord::Base
   end
 
   private
+
+  def validate_custom_errors
+    ensure_hash_for_errors
+    @custom_errors.each do |attribute, error_message|
+      errors.add(attribute, error_message)
+    end
+  end
+
+  def validate_origin_dest
+    if (attr_present? origin_name) && (attr_present? destination_name)
+      if !(origin_name.upcase =='LARKIN LLC') and
+          !(destination_name.upcase == 'LARKIN LLC')
+        errors.add(:base, "Destination Name or Origin Name should be Larkin LLC")
+      end
+    end
+  end
+
   def get_delivery_type
     unless origin_name.nil?
       if origin_name.upcase =='LARKIN LLC'
@@ -73,15 +93,6 @@ class OrderRelease < ActiveRecord::Base
   end
 
 
-  def validate_origin_dest
-    if (attr_present? origin_name) && (attr_present? destination_name)
-      if !(origin_name.upcase =='LARKIN LLC') and
-          !(destination_name.upcase == 'LARKIN LLC')
-        errors.add(:base, "Destination Name or Origin Name should be Larkin LLC")
-      end
-    end
-  end
-
   def set_defaults
     self.status = OrderRelease.statuses[:not_planned] if self.new_record?
     self.delivery_type= get_delivery_type
@@ -89,5 +100,11 @@ class OrderRelease < ActiveRecord::Base
 
   def attr_present? attr
     !attr.nil? && attr.length!=0
+  end
+
+  def ensure_hash_for_errors
+    if @custom_errors.nil?
+      @custom_errors = {}
+    end
   end
 end

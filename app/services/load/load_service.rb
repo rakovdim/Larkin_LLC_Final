@@ -3,6 +3,21 @@ class LoadService
     @model_validator = ModelValidator.new
   end
 
+  def get_current_load_for_driver(driver_id)
+    TxUtils.execute_transacted_action(lambda {
+      delivery_date = Date.today - 1.year
+      delivery_shift = Load.delivery_shifts[:morning]
+      find_load_by_driver_or_stub(delivery_date, delivery_shift, driver_id)
+    })
+  end
+
+  def get_load_for_driver(date_shift_request, driver_id)
+    TxUtils.execute_transacted_action(lambda {
+      load = find_load_by_driver_or_stub(date_shift_request.delivery_date, date_shift_request.delivery_shift, driver_id)
+      OrdersCollectingResponse.new(load.order_releases, load.order_releases.length)
+    })
+  end
+
   # Method returns load for current date and morning shift
   # If load doesn't exist then fake object is created
   # It is used for initial data presentation
@@ -22,8 +37,10 @@ class LoadService
   # Returns stub values if load does not exist
   def get_load_data (orders_request)
     TxUtils.execute_transacted_action(lambda {
-      load = LoadService.new.get_load_by_date_and_shift orders_request.delivery_date,
-                                                        orders_request.delivery_shift
+      load = get_load_by_date_and_shift orders_request.delivery_date,
+                                        orders_request.delivery_shift
+
+      #todo make the solution more unified
       LoadDataResponse.create(load)
     })
   end
@@ -37,12 +54,6 @@ class LoadService
       perform_load_data_update(load, update_request)
       load.save!
     })
-  end
-
-  # Finds load by delivery_date and delivery_shift
-  # Returns nil if load was not found
-  def get_load_by_date_and_shift(delivery_date, delivery_shift)
-    Load.where('delivery_date=? and delivery_shift=?', delivery_date, delivery_shift).first
   end
 
   # Reopens requested load switching it and its orders in Not Planning state
@@ -145,8 +156,10 @@ class LoadService
     orders.concat(load.order_releases)
     orders.insert(new_pos, orders.delete_at(old_pos))
     orders_map = get_orders_as_map(load)
+    puts load.order_releases.length
     orders.each_with_index do |order_release, index|
-      orders_map[order_release.id].stop_order_number = index
+      puts orders_map[order_release.id]
+      orders_map[order_release.id].stop_order_number = index+1
     end
     orders
   end
@@ -188,7 +201,7 @@ class LoadService
   #todo may be do it in the first cycle
   #todo get last order_number and continue
   def apply_ordering (load)
-    order = 0
+    order = 1
     load.order_releases.each do |order_release|
       order_release.stop_order_number = order
       order = order+1
@@ -202,5 +215,26 @@ class LoadService
       raise WarningException.new (e.message)
     end
   end
+
+  def find_load_by_driver_or_stub(delivery_date, delivery_shift, driver_id)
+    load_status = Load.statuses[:not_planned]
+    load = Load.where(:delivery_date => delivery_date, :delivery_shift => delivery_shift).
+        where.not(:status => load_status).
+        joins(:truck).where(:trucks => {:driver_id => driver_id}).first
+
+    load = Load.new(:delivery_shift => delivery_shift,
+                    :delivery_date => delivery_date,
+                    :truck => Truck.find_by_driver_id(driver_id),
+                    :order_releases => []) unless load
+
+    puts load.to_json
+    load
+
+  end
+
+  def get_load_by_date_and_shift(delivery_date, delivery_shift)
+    Load.where(:delivery_date => delivery_date, :delivery_shift => delivery_shift).first
+  end
+
 
 end
