@@ -23,36 +23,14 @@ class OrderReleaseService
     })
   end
 
-  def get_load_data (orders_request)
-    TxUtils.execute_transacted_action(lambda {
-      load = LoadService.new.get_load_by_date_and_shift orders_request.delivery_date,
-                                                        orders_request.delivery_shift
-      if load
-        planning_orders = load.order_releases
-        load_status = load.status.humanize
-        truck_volume = load.total_volume
-        truck_id = load.truck_id
-        load_id = load.id
-      else
-        planning_orders = []
-        load_status = OrderRelease.not_planned_status.humanize
-        truck_id = nil
-        load_id = nil
-        truck_volume = 0
-      end
 
-      OrdersCollectingResponse.create_plan_orders_response(planning_orders, planning_orders.length, load_status, truck_volume, truck_id, load_id)
-    })
-  end
-
-  #todo refactor
   def get_available_orders (orders_request)
     TxUtils.execute_transacted_action(lambda {
       where_query_for_orders = where_query_for_orders(orders_request.delivery_date, orders_request.delivery_shift)
       found_orders = where_query_for_orders.select(orders_request.required_columns).offset(orders_request.start).limit(orders_request.length)
       total_count = where_query_for_orders.count
       puts found_orders.length
-      OrdersCollectingResponse.create_av_orders_response(found_orders, total_count)
+      OrdersCollectingResponse.new(found_orders, total_count)
     })
   end
 

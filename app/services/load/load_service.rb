@@ -18,6 +18,16 @@ class LoadService
     })
   end
 
+  # Returns data of requested order
+  # Returns stub values if load does not exist
+  def get_load_data (orders_request)
+    TxUtils.execute_transacted_action(lambda {
+      load = LoadService.new.get_load_by_date_and_shift orders_request.delivery_date,
+                                                        orders_request.delivery_shift
+      LoadDataResponse.create(load)
+    })
+  end
+
   # Updates truck for load if load is not planned for delivery
   def update_load_data(update_request)
     TxUtils.execute_transacted_action (lambda {
@@ -130,7 +140,6 @@ class LoadService
     end
   end
 
-  #todo validation if load.hasOrders
   def move_order_to_new_position(load, old_pos, new_pos)
     orders = []
     orders.concat(load.order_releases)

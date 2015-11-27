@@ -1,8 +1,6 @@
 class SessionsController < ApplicationController
 
-  #todo go to home_page
   def new
-
   end
 
   def home

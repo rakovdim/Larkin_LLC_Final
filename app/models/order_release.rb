@@ -38,9 +38,8 @@ class OrderRelease < ActiveRecord::Base
   validates :handling_unit_quantity, numericality: {only_integer: true, :greater_than_or_equal_to => 1}, :if => :handling_unit_quantity
 
 
-  #todo destination||origin == 'Larkin LLC'
-  #todo box < 1
-  #todo negative values
+  #todo date format
+  #todo enums
 
   def as_json(options = {})
     # just in case someone says as_json(nil) and bypasses

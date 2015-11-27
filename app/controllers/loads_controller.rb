@@ -44,20 +44,20 @@ class LoadsController < ApplicationController
   end
 
   def get_load_data
-    process_collect_data_request(lambda { |request|
-      OrderReleaseService.new.get_load_data (request) })
+    process_collect_data_request(date_shift_request, lambda { |request|
+      LoadService.new.get_load_data (request) })
   end
 
   def get_available_orders
-    process_collect_data_request(lambda { |request|
+    process_collect_data_request(collect_orders_request, lambda { |request|
       OrderReleaseService.new.get_available_orders (request) })
   end
 
   private
 
-  def process_collect_data_request (processing_action)
+  def process_collect_data_request (request, processing_action)
     authorize_operation! :load_planning
-    orders_response = processing_action.call(collect_orders_request)
+    orders_response = processing_action.call(request)
     orders_response.set_draw params[:draw].to_i
     send_json_response(orders_response.to_json)
   end

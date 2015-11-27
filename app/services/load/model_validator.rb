@@ -16,7 +16,7 @@ class ModelValidator
   def validate_order_for_load (order, load)
     validate_object_not_planned (order)
 
-    raise ModelOperationException(order_already_in_load_msg(order)) if order.load_id != nil
+    raise ModelOperationException.new(order_already_in_load_msg(order)) if order.load_id != nil
 
     if !order.any_time? && order.delivery_shift != load.delivery_shift
       raise ModelOperationException.new(incorrect_order_delivery_shift_msg(load, order))
