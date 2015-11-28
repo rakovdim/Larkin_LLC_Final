@@ -1,12 +1,25 @@
 <header class="navbar navbar-fixed-top navbar-inverse">
   <div class="container">
-    <%= link_to "Larkin LLC", root_path, id: "logo" %>
+    <div class="row">
+      <div class="col-sm-3">
+        <%= link_to "Larkin LLC", root_path, id: "logo" %>
+      </div>
 
-    <% if logged_in? %>
-        <ul class="nav navbar-nav navbar-right">
-          <li><%= link_to "Logout from "+ current_user.login, logout_path, method: :delete %></li>
-        </ul>
-    <% end %>
+      <div class="col-sm-4">
+        <% if logged_in? && can?(:order_management, OrderRelease) %>
+            <ul class="tab nav navbar-nav navbar-right">
+              <li><%= link_to "Order Management", order_releases_path %></li>
+              <li><%= link_to "Load Planning", load_planning_path %></li>
+            </ul>
+        <% end %>
+      </div>
+      <div class="col-sm-5">
+        <% if logged_in? %>
+            <ul class="nav navbar-nav navbar-right">
+              <li><%= link_to "Logout from "+ current_user.login, logout_path, method: :delete %></li>
+            </ul>
+        <% end %>
+      </div>
+    </div>
   </div>
-
 </header>
