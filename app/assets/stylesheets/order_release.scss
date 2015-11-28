@@ -2,8 +2,8 @@
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
-#order_releases_upload, #order_releases_list{
-  word-wrap: break-word;
+.orders-table {
+  //word-wrap: break-word;
   text-align: center;
   font-size: 12px;
   td th {
@@ -11,7 +11,37 @@
   }
   tbody {
     tr {
-      height: 30px; /* or whatever height you need to make them all consistent */
+      height: 20px; /* or whatever height you need to make them all consistent */
     }
   }
+}
+
+.dataTables_wrapper {
+  font-size: 14px
+}
+
+.order-attribute {
+  float: left;
+}
+
+.order-value {
+  float: right;
+  width: 220px;
+  .value-text {
+    text-align: right;
+  }
+}
+
+.order-params {
+  width: 90%;
+}
+
+.orders_caption {
+  float: left;
+  alignment: left;
+  color: black;
+}
+
+.pagination{
+  font-size: 12px;
 }

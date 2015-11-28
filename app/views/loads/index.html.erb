@@ -52,11 +52,13 @@
   <div class="row">
     <div class="col-sm-6">
       <div class="dt-buttons">
-        <button id="split_av_order_button" class="btn-link toolbar-button" tabindex="0">Split Order</button>
-        <button id="submit_orders_button" class="btn-link toolbar-button" tabindex="0">Submit Orders</button>
+        <button id="split_av_order_button" class="btn-link toolbar-button">Split Order</button>
+        <button id="submit_orders_button" class="btn-link toolbar-button">Submit Orders</button>
+        <button id="show_all_button" class="btn-link toolbar-button">Show All Orders</button>
+        <button id="show_returns_button" class="btn-link toolbar-button">Show Return Orders</button>
       </div>
       <hr>
-      <table class='available_order_table table table-striped table-condensed table-bordered table-hover display' id="available_orders">
+      <table class='table  table-striped table-bordered plan-orders-table' id="available_orders">
         <thead>
         <tr>
           <th><input type="checkbox" id="av_orders_checkbox"/></th>
@@ -81,7 +83,7 @@
         <button id="reopen_load_button" class="btn-link toolbar-button" tabindex="0">Reopen Load</button>
       </div>
       <hr>
-      <table class='planning_orders_table table table-striped table-condensed table-bordered table-hover display' id="planning_orders">
+      <table class='table table-striped table-bordered plan-orders-table' id="planning_orders">
         <thead>
         <tr>
           <th><input type="checkbox" id="plan_orders_checkbox"/></th>

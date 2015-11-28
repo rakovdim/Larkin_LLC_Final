@@ -3,26 +3,24 @@ class LoadService
     @model_validator = ModelValidator.new
   end
 
-  def get_current_load_for_driver(driver_id)
-    TxUtils.execute_transacted_action(lambda {
-      delivery_date = Date.today - 1.year
-      delivery_shift = Load.delivery_shifts[:morning]
-      find_load_by_driver_or_stub(delivery_date, delivery_shift, driver_id)
-    })
-  end
-
+  # Returns load with orders which is assigned on corresponding driver
+  # In case is there are no load, stub is returned
   def get_load_for_driver(date_shift_request, driver_id)
     TxUtils.execute_transacted_action(lambda {
       load = find_load_by_driver_or_stub(date_shift_request.delivery_date, date_shift_request.delivery_shift, driver_id)
-      OrdersCollectingResponse.new(load.order_releases, load.order_releases.length)
+      LoadDataResponse.new(load)
     })
   end
 
-  # Method returns load for current date and morning shift
-  # If load doesn't exist then fake object is created
-  # It is used for initial data presentation
-  # Method also returns all trucks in the system
-  def get_current_load
+  # Method is used to construct data for initial load planning
+  # It requires:
+  #   1) Load data for today if exists (if not, then stub is returned)
+  #   2) Trucks list which are available for loading
+  # Method returns load for today and morning shift
+  # If load doesn't exist then stub object is returned
+  #
+  # Note! To simplify UI visualization process 2014 year is set as current year
+  def get_initial_load_data
     TxUtils.execute_transacted_action(lambda {
       delivery_date = Date.today - 1.year
       delivery_shift = Load.delivery_shifts[:morning]
@@ -35,13 +33,12 @@ class LoadService
 
   # Returns data of requested order
   # Returns stub values if load does not exist
-  def get_load_data (orders_request)
+  def get_load_data (date_shift_request)
     TxUtils.execute_transacted_action(lambda {
-      load = get_load_by_date_and_shift orders_request.delivery_date,
-                                        orders_request.delivery_shift
+      load = get_or_create_load date_shift_request.delivery_date,
+                                date_shift_request.delivery_shift
 
-      #todo make the solution more unified
-      LoadDataResponse.create(load)
+      LoadDataResponse.new(load)
     })
   end
 
@@ -120,7 +117,6 @@ class LoadService
       move_order_to_new_position(load, old_pos, new_pos)
       load.save!
       load })
-    #todo sort orders
     emulate_delivery_with_warning(load)
   end
 
@@ -151,14 +147,15 @@ class LoadService
     end
   end
 
+  # It is not well constructed method
+  # But i couldn't find any solution to reorder collection of children (order_release objects) inside Load
+  # That's why i
   def move_order_to_new_position(load, old_pos, new_pos)
     orders = []
     orders.concat(load.order_releases)
     orders.insert(new_pos, orders.delete_at(old_pos))
     orders_map = get_orders_as_map(load)
-    puts load.order_releases.length
     orders.each_with_index do |order_release, index|
-      puts orders_map[order_release.id]
       orders_map[order_release.id].stop_order_number = index+1
     end
     orders
@@ -181,14 +178,6 @@ class LoadService
     end
   end
 
-
-  def get_or_create_load(delivery_date, delivery_shift)
-    load = get_load_by_date_and_shift delivery_date, delivery_shift
-    load = Load.new(:delivery_shift => delivery_shift,
-                    :delivery_date => delivery_date) unless load
-    load
-  end
-
   def get_orders_as_map(load)
     result = {}
     load.order_releases.each do |order|
@@ -198,8 +187,6 @@ class LoadService
     result
   end
 
-  #todo may be do it in the first cycle
-  #todo get last order_number and continue
   def apply_ordering (load)
     order = 1
     load.order_releases.each do |order_release|
@@ -222,19 +209,32 @@ class LoadService
         where.not(:status => load_status).
         joins(:truck).where(:trucks => {:driver_id => driver_id}).first
 
-    load = Load.new(:delivery_shift => delivery_shift,
-                    :delivery_date => delivery_date,
-                    :truck => Truck.find_by_driver_id(driver_id),
-                    :order_releases => []) unless load
+    unless load
+      load = create_load(delivery_date, delivery_shift)
+      load.truck = Truck.find_by_driver_id(driver_id)
+    end
 
-    puts load.to_json
     load
 
   end
+
+  def get_or_create_load(delivery_date, delivery_shift)
+    load = get_load_by_date_and_shift(delivery_date, delivery_shift)
+
+    load = create_load(delivery_date, delivery_shift) unless load
+
+    load
+  end
+
 
   def get_load_by_date_and_shift(delivery_date, delivery_shift)
     Load.where(:delivery_date => delivery_date, :delivery_shift => delivery_shift).first
   end
 
+  def create_load(delivery_date, delivery_shift)
+    Load.new(:delivery_shift => delivery_shift,
+             :delivery_date => delivery_date,
+             :order_releases => [])
+  end
 
 end

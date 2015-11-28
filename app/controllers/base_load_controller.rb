@@ -18,4 +18,11 @@ class BaseLoadController < ApplicationController
       format.json { render :json => json_response }
     end
   end
+
+  # Note! To simplify UI visualization process 2014 year is set as current year
+  def today_date_shift_request
+    delivery_date = Date.today - 1.year
+    delivery_shift = Load.delivery_shifts[:morning]
+    DateShiftRequest.new(delivery_date, delivery_shift)
+  end
 end

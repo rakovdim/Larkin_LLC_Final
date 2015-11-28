@@ -40,6 +40,7 @@ class OrderRelease < ActiveRecord::Base
 
   validate :validate_origin_dest
   validate :validate_custom_errors
+  validate :validate_origin_dest_not_equal
 
   def add_custom_validation_error (attribute, error_message)
     ensure_hash_for_errors
@@ -71,6 +72,10 @@ class OrderRelease < ActiveRecord::Base
     @custom_errors.each do |attribute, error_message|
       errors.add(attribute, error_message)
     end
+  end
+
+  def validate_origin_dest_not_equal
+    errors.add(:origin_name, "can't be the same as Destination Name") if origin_name == destination_name
   end
 
   def validate_origin_dest

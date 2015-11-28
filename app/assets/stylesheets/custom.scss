@@ -1,28 +1,11 @@
 
 
-/* mixins, variables, etc. */
-
-$gray-medium-light: #eaeaea;
-
-@mixin box_sizing {
-  -moz-box-sizing: border-box;
-  -webkit-box-sizing: border-box;
-  box-sizing: border-box;
-}
-
-/* miscellaneous */
 .toolbar-button {
   color: darkblue;
 }
 
 label {
   font-weight: normal;
-}
-
-.orders_caption {
-  float: left;
-  alignment: left;
-  color: black;
 }
 
 /* universal */
@@ -61,13 +44,6 @@ section {
 
 textarea {
   resize: vertical;
-}
-
-.center {
-  text-align: center;
-  h1 {
-    margin-bottom: 10px;
-  }
 }
 
 /* typography */
@@ -113,22 +89,9 @@ body {
   padding-top: 60px;
 }
 
-/* footer */
 
 .system {
   visibility: hidden;
-}
-
-.order-attribute {
-  float: left;
-}
-
-.order-value {
-  float: right;
-  width: 220px;
-  .value-text {
-    text-align: right;
-  }
 }
 
 tr, th, td {
@@ -137,9 +100,6 @@ tr, th, td {
   horiz-align: center;
 }
 
-.order-params {
-  width: 90%;
-}
 
 .top-buffer {
   margin-top: 20px;
@@ -152,9 +112,4 @@ tr, th, td {
 hr {
   clear: both;
   margin: 0;
-}
-
-.load-planning {
-  width: 100%;
-  margin-left: 0;
 }

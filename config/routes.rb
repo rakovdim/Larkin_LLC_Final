@@ -4,6 +4,7 @@ Rails.application.routes.draw do
   get 'load_planning' => 'loads#index'
   get 'orders_delivery' => 'orders_delivery#index'
   get 'get_delivery_data' => 'orders_delivery#get_delivery_data'
+  get 'download_routing_list' => 'orders_delivery#download_routing_list'
 
   resources :order_releases
 
@@ -24,6 +25,8 @@ Rails.application.routes.draw do
   post 'login' => 'sessions#create'
   delete 'logout' => 'sessions#destroy'
   get 'logout' => 'sessions#destroy'
+
+  match "*path", :to => "application#catch_routing_error", :via => :all
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

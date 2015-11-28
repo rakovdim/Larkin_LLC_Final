@@ -7,6 +7,21 @@ class PageStructureBuilder
     @pageStructure = new PageStructure()
     @loadController.setPageStructure(@pageStructure)
 
+  addShowAllButton: (buttonId)->
+    button = $('#' + buttonId)
+    @pageStructure.setShowAllButton(button)
+    button.hide()
+    button.click =>
+      @loadController.showOnlyReturnOrders(false)
+    this
+
+  addShowReutrnsButton: (buttonId)->
+    button = $('#' + buttonId)
+    @pageStructure.setShowReturnsButton(button)
+    button.click =>
+      @loadController.showOnlyReturnOrders(true)
+    this
+
   addReopenLoadButton: (buttonId)->
     button = $('#' + buttonId)
     @pageStructure.setReopenLoadButton(button)
@@ -82,19 +97,19 @@ class PageStructureBuilder
 
   addAvailableOrdersTable: (tableId) ->
     if !Table.isDataTableInit(tableId)
-      avOrdersTable = this.constructEntireTable(tableId, '/get_available_orders', 'av_orders_checkbox', true, false)
+      avOrdersTable = this.constructEntireTable(tableId, '/get_available_orders', 'av_orders_checkbox', true, false, false)
       @pageStructure.setAvailableOrdersTable(avOrdersTable)
     this
 
   addPlanningOrdersTable: (tableId)->
     if !Table.isDataTableInit(tableId)
-      planOrdersTable = this.constructEntireTable(tableId, '/get_load_data', 'plan_orders_checkbox', false, true)
+      planOrdersTable = this.constructEntireTable(tableId, '/get_load_data', 'plan_orders_checkbox', false, true, true)
       this.addRowReorderListener(planOrdersTable).addRefreshTableListener(planOrdersTable)
       @pageStructure.setPlanningOrdersTable(planOrdersTable)
     this
 
-  constructEntireTable: (tableId, ajaxUrl, allOrdersCheckboxId, paging, dnd) ->
-    table = this.createDataTable(tableId, ajaxUrl, allOrdersCheckboxId, paging, dnd)
+  constructEntireTable: (tableId, ajaxUrl, allOrdersCheckboxId, paging, dnd, scrollY) ->
+    table = this.createDataTable(tableId, ajaxUrl, allOrdersCheckboxId, paging, dnd, scrollY)
     this.addNextPageTableListener(table).addSelectAllOrdersListener(table)
     table
 
@@ -124,16 +139,15 @@ class PageStructureBuilder
           break
     this
 
-  createDataTable: (tableId, ajaxUrl, allOrdersCheckboxId, paging, dnd) ->
+  createDataTable: (tableId, ajaxUrl, allOrdersCheckboxId, paging, dnd, scrollY) ->
     table = new Table(tableId)
     table.setAllOrdersCheckbox(Checkbox.createAllOrdersCheckbox(allOrdersCheckboxId))
     commonData = {
-      scrollY: '400px'
       scrollX: false
       processing: false
       serverSide: true
       ordering: false
-      pageLength: 12
+      pageLength: 9
       bPaginate: paging
       bInfo: paging
       bLengthChange: false
@@ -148,10 +162,14 @@ class PageStructureBuilder
           d.seatch = null
           d.delivery_date = @pageStructure.getDeliveryDate()
           d.delivery_shift = @pageStructure.getDeliveryShift()
+          d.returns_only = @pageStructure.showReturnsOnlyEnabled
           d
       }
 
       rowCallback: (row, data, dataIndex)=>
+        volumeRow = $(row).find('td:nth-child(6)')
+        volume = volumeRow.text()
+        volumeRow.text((parseFloat(volume)).toFixed(2))
         orderId = data.id
         checkbox = Checkbox.createOrderCheckbox(orderId)
         firstTd = $(row).find('td:first')
@@ -174,6 +192,10 @@ class PageStructureBuilder
     }
     if (dnd)
       commonData['rowReorder'] = {selector: 'tr td:not(:first-child)'}
+
+    if (scrollY)
+      commonData['scrollCollapse'] = false
+      commonData['scrollY'] = '400px'
 
     table.setAPI($('#' + tableId).DataTable(commonData))
     table
@@ -336,6 +358,8 @@ class SplitDialog
 
 class PageStructure
   constructor: ->
+    @showReturnsOnlyEnabled = false
+
   setLoadId: (@loadId)->
   setPlanningOrdersTable: (@planningOrdersTable)->
   setAvailableOrdersTable: (@availableOrdersTable)->
@@ -351,6 +375,17 @@ class PageStructure
   setSplitPlanOrderButton: (@splitPlanOrderButton)->
   setSplitOrderDialog: (@splitOrderDialog)->
   setReopenLoadButton: (@reopenLoadButton)->
+  setShowAllButton: (@showAllButton)->
+  setShowReturnsButton: (@showReturnsButton)->
+
+  setShowReturnsOnlyEnabled: (showReturnsOnlyEnabled)->
+    @showReturnsOnlyEnabled = showReturnsOnlyEnabled
+    if (@showReturnsOnlyEnabled)
+      @showAllButton.show()
+      @showReturnsButton.hide()
+    else
+      @showAllButton.hide()
+      @showReturnsButton.show()
 
   isAlreadyInit: ->
     this.isTableInit(@planningOrdersTable)
@@ -422,6 +457,11 @@ class LoadController
   changeTruckForLoad: ->
     if (@pageStructure.loadId != null && @pageStructure.loadId != undefined )
       this.executeAjaxRequest('/update_load_data', this.updateLoadRequest())
+
+  showOnlyReturnOrders: (option) ->
+    @pageStructure.setShowReturnsOnlyEnabled(option)
+    @pageStructure.availableOrdersTable.refresh(false)
+
 
   updatePageDataSync: (data)->
     @pageStructure.updatePageData(data)
@@ -572,6 +612,8 @@ $(document).on "page:change", ->
     addSplitOrderDialog('split_order_dialog').
     addSplitAvOrderButton('split_av_order_button').
     addSplitPlanOrderButton('split_plan_order_button').
-    addReopenLoadButton('reopen_load_button')
+    addReopenLoadButton('reopen_load_button').
+    addShowAllButton('show_all_button').
+    addShowReutrnsButton('show_returns_button')
 
 

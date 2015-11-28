@@ -33,8 +33,9 @@ class OrderReleasesController < ApplicationController
     authorize_order_management!
 
     params[:data] = JSON.parse params[:data]
+    permitted_params = upload_orders_permitted_params[:data]
 
-    upload_response= OrderReleaseService.new.save_orders_bulk(upload_orders_permitted_params[:data])
+    upload_response= OrderReleaseService.new.save_orders_bulk(permitted_params)
 
     if upload_response.result
       flash[:success] = 'Orders were successfully uploaded'

@@ -3,12 +3,12 @@ class DeliveryEmulator
     @load=load
     @truck_capacity = load.truck.max_capacity
     @in_truck_orders_volume = 0
-    #todo step can be optimized because sorting is need only in case of reordering now
+    #todo this step can be optimized because sorting is need only in rows reordering case
     @sorted_by_stops_orders = sort_orders_by_stop_number(load)
   end
 
   def perform_dryrun_delivery
-    #todo can be simplified by calling load.get_delivery_volume
+    #todo can be simplified by calling load.get_delivering_volume
     perform_dryrun_orders_loading
 
     perform_dryrun_orders_delivery

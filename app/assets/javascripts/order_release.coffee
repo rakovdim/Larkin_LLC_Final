@@ -14,14 +14,14 @@ class PageStructureBuilder
   constructor: ->
     @page_structure = new OrdersPageStructure()
 
-  addOrdersTable: (table_id, search = false, itemsCount = false) ->
+  addOrdersTable: (table_id, search = false, itemsCount = false, scrollX = false) ->
     @page_structure.setTable(table_id)
     if !@page_structure.isDataTableInit()
       $('#' + table_id).dataTable
         bJQueryUI: true
         bInfo: itemsCount
         bFilter: search
-        scrollX: true
+        scrollX: scrollX
         paging: false
         ordering: false
     this
@@ -75,7 +75,6 @@ class OrdersController
     }).append($('<input>', {
       'name': 'data'
       'value': orders_as_json.replace(new RegExp("client name", 'g'), "destination_name")
-#'value': orders_as_json
     })).append($('<input>', {
       'type': 'hidden',
       'name': 'authenticity_token',
@@ -101,7 +100,7 @@ $(document).on "page:change", ->
 
   else if (top.location.pathname == '/save_orders')
     page_structure_builder_2 = new PageStructureBuilder()
-    page_structure_2 = page_structure_builder_2.addOrdersTable("order_releases_upload", false, true)
+    page_structure_2 = page_structure_builder_2.addOrdersTable("order_releases_upload", false, true,true)
     .addButtonListener('proceed_button', ->
       orders_controller_2.upload_orders_from_table()
     ).addInLineEditForTable().page_structure

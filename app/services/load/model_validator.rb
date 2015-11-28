@@ -1,6 +1,5 @@
 class ModelValidator
 
-  #todo support set of statuses and don't refer to OrderRelease methods
   def validate_object_status (object, status)
     raise ModelOperationException.new(incorrect_object_status_msg(object, status)) if object.status != status
   end

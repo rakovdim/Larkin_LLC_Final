@@ -2,7 +2,7 @@
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
-.available_order_table, .planning_orders_table, #orders_delivery_table {
+.plan-orders-table {
   //word-wrap: break-word;
   text-align: center;
   font-size: 10px;
@@ -11,16 +11,17 @@
   }
   tbody {
     tr {
-      height: 30px; /* or whatever height you need to make them all consistent */
+      height: 20px; /* or whatever height you need to make them all consistent */
     }
   }
 }
 
-div.dataTables_scrollHeadInner table { margin-bottom: 0 !important }
+div.dataTables_scrollHeadInner table {
+  margin-bottom: 0 !important
+}
 
 .dataTables_paginate, .dataTables_info, .dataTables_length {
   font-size: 10px;
-
 }
 
 .dataTables_paginate {
@@ -38,12 +39,4 @@ div.dataTables_scrollHeadInner table { margin-bottom: 0 !important }
 .validateTips {
   border: 1px solid transparent;
   padding: 0.3em;
-}
-
-input[type=checkbox]
-{
-  /* Double-sized Checkboxes */
-  -webkit-transform: scale(1); /* FF */
-  transform: scale(1); /* Safari and Chrome */
-  padding: 5px;
 }

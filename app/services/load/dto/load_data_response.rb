@@ -1,25 +1,18 @@
 class LoadDataResponse < OrdersCollectingResponse
+  attr_accessor :load
 
-  def self.create (load)
-    if load
-      LoadDataResponse.new(load.order_releases,
-                           load.order_releases.length,
-                           load.status.humanize,
-                           load.total_volume,
-                           load.truck_id,
-                           load.id,
-      )
-    else
-      LoadDataResponse.new([], 0, OrderRelease.not_planned_status.humanize, 0, nil, nil)
-    end
+  def initialize(load)
+    super(load.order_releases, load.order_releases.length)
+    @load = load
   end
 
-  private
-  def initialize(order_releases, orders_count, load_status, truck_volume, truck_id, load_id)
-    super(order_releases, orders_count)
-    @load_status = load_status
-    @truck_volume = truck_volume
-    @truck_id = truck_id
-    @load_id = load_id
+  def as_json(options = {})
+    result = super(options)
+    result[:load_status] = load.status.humanize
+    result[:truck_volume] = load.total_volume
+    result[:truck_id] = load.truck_id
+    result[:load_id] = load.id
+    result.except('load')
   end
+
 end

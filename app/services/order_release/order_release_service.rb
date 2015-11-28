@@ -25,7 +25,6 @@ class OrderReleaseService
       new_quantity = split_order_request.new_quantity
 
       @model_validator.validate_order_for_splitting(order_release, new_volume, new_quantity)
-
       remaining_order_release = perform_splitting(order_release, new_volume, new_quantity)
 
       order_release.save!
@@ -37,12 +36,13 @@ class OrderReleaseService
   # It means that all returned orders meet following requirements:
   #   1) Order is in Not Planned status
   #   2) Order delivery shift is any_time or is equal to load delivery shift
-  #   3) Order delivery date is less or equal to load delivery date
+  #   3) Order delivery date is less or equal than load delivery date
   #   4) Load_id of order is null (order doesn't belong to any load)
   # This method supports pagination to reduce returned data
+  # Also method provides an ability to load from db only return orders
   def get_available_orders (orders_request)
     TxUtils.execute_transacted_action(lambda {
-      where_query_for_orders = where_query_for_orders(orders_request.delivery_date, orders_request.delivery_shift)
+      where_query_for_orders = where_query_for_orders(orders_request.delivery_date, orders_request.delivery_shift, orders_request.returns_only=='true')
       found_orders = where_query_for_orders.select(orders_request.required_columns).offset(orders_request.start).limit(orders_request.length)
       total_count = where_query_for_orders.count
       puts found_orders.length
@@ -50,10 +50,10 @@ class OrderReleaseService
     })
   end
 
-  # Saves collection of orders bulk. Based on incoming orders params
-  # Method makes an assumption that data types and format are valid for order_release
-  # All valid orders are stored in one SQL Batch to DB
-  # All invalid orders are returned for further fixes
+  # Bulk stores collection of orders. Bases on incoming orders parameters
+  # Method detects valid and invalid orders and processes them separately:
+  #   1) All valid orders are stored in one SQL Batch to DB
+  #   2) All invalid orders are returned for further fixes
   def save_orders_bulk (orders_params_array)
     valid_orders = []
     invalid_orders = []
@@ -68,7 +68,23 @@ class OrderReleaseService
     process_valid_invalid_orders valid_orders, invalid_orders
   end
 
-    private
+  # Transforms order_releases list to CSV format
+  # Delivery type value insertion is hardcoded
+  def to_csv(order_releases, column_names)
+    raise InternalModelOperationException.new ("Can't download routing list, no orders have been found for date: #{request.delivery_date} shift: #{request.delivery_shift}") if order_releases.length ==0
+
+    CSV.generate do |csv|
+      csv << column_names
+      delivery_type_index = column_names.find_index('delivery_type')
+      order_releases.each do |order_release|
+        order_csv = order_release.attributes.values_at(*column_names)
+        order_csv[delivery_type_index]= order_release.delivery_type #.insert(delivery_type_index-1, order_release.delivery_type) if delivery_type_index != nil
+        csv << order_csv
+      end
+    end
+  end
+
+  private
 
   def process_valid_invalid_orders (valid_orders, invalid_orders)
 
@@ -87,10 +103,14 @@ class OrderReleaseService
     end
   end
 
-  def where_query_for_orders (delivery_date, delivery_shift)
-    OrderRelease.where('delivery_shift IN (?) and delivery_date <= ? and status=? and load_id is null',
-                       [delivery_shift, OrderRelease.delivery_shifts[:any_time]], delivery_date, OrderRelease.statuses[:not_planned]).
-        order(:delivery_shift)
+  def where_query_for_orders(delivery_date, delivery_shift, returns_only)
+    query = OrderRelease.where('delivery_shift IN (?) and delivery_date <= ? and status=? and load_id is null',
+                               [delivery_shift, OrderRelease.delivery_shifts[:any_time]], delivery_date, OrderRelease.statuses[:not_planned])
+
+
+    query = query.where('lower(destination_name) = ?', 'larkin llc') if returns_only
+
+    query.order(:delivery_shift)
   end
 
   def perform_splitting(order_release, new_volume, new_quantity)

@@ -28,24 +28,15 @@ class SessionsController < ApplicationController
     clear_current_user
   end
 
-  private def get_login
+  private
+  def get_login
     params[:session][:login].downcase
   end
 
-  private def get_password
+  def get_password
     params[:session][:password]
   end
 
-  private def redirect_to_home_page
-    if logged_in?
-      if current_user.has_role? 'dispatcher'
-        redirect_to order_releases_path
-      else
-        redirect_to orders_delivery_path
-      end
-    else
-      redirect_to login_path
-    end
-  end
+
 
 end

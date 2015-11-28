@@ -1,10 +1,11 @@
 class OrdersCollectingRequest < DateShiftRequest
-  attr_accessor :required_columns, :start, :length
+  attr_accessor :required_columns, :start, :length, :returns_only
 
-  def initialize(required_columns, start, length, delivery_date, delivery_shift)
+  def initialize(required_columns, start, length, delivery_date, delivery_shift, returns_only)
     super(delivery_date, delivery_shift)
     @required_columns = required_columns
-    @start = start.to_i
-    @length = length.to_i
+    @start = start
+    @length = length
+    @returns_only = returns_only
   end
 end

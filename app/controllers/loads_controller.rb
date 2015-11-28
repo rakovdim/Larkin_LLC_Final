@@ -1,9 +1,9 @@
 class LoadsController < BaseLoadController
   def index
     authorize_operation! :load_planning
-    current_load_response = LoadService.new.get_current_load
-    @trucks = current_load_response.all_trucks
-    @load = current_load_response.load
+    initial_load_response = LoadService.new.get_initial_load_data
+    @trucks = initial_load_response.all_trucks
+    @load = initial_load_response.load
   end
 
   def split_order
@@ -78,7 +78,7 @@ class LoadsController < BaseLoadController
 
 
   def collect_orders_request
-    OrdersCollectingRequest.new(required_columns, params.require(:start), params.require(:length), get_request_date, get_request_shift)
+    OrdersCollectingRequest.new(required_columns, params.require(:start).to_i, params.require(:length).to_i, get_request_date, get_request_shift, params[:returns_only])
   end
 
   def submit_return_orders_request
@@ -128,6 +128,4 @@ class LoadsController < BaseLoadController
      :purchase_order_number,
      :volume, :handling_unit_quantity]
   end
-
-
 end
