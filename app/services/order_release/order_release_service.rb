@@ -46,6 +46,7 @@ class OrderReleaseService
       found_orders = where_query_for_orders.select(orders_request.required_columns).offset(orders_request.start).limit(orders_request.length)
       total_count = where_query_for_orders.count
       puts found_orders.length
+
       OrdersCollectingResponse.new(found_orders, total_count)
     })
   end
@@ -110,7 +111,7 @@ class OrderReleaseService
 
     query = query.where('lower(destination_name) = ?', 'larkin llc') if returns_only
 
-    query.order(:delivery_shift)
+    query.order('delivery_date DESC').order(:delivery_shift).order(:id)
   end
 
   def perform_splitting(order_release, new_volume, new_quantity)

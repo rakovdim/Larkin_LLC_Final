@@ -7,7 +7,7 @@ class LoadService
   # In case is there are no load, stub is returned
   def get_load_for_driver(date_shift_request, driver_id)
     TxUtils.execute_transacted_action(lambda {
-      load = find_load_by_driver_or_stub(date_shift_request.delivery_date, date_shift_request.delivery_shift, driver_id)
+      load = get_or_create_load_by_driver(date_shift_request.delivery_date, date_shift_request.delivery_shift, driver_id)
       LoadDataResponse.new(load)
     })
   end
@@ -203,10 +203,9 @@ class LoadService
     end
   end
 
-  def find_load_by_driver_or_stub(delivery_date, delivery_shift, driver_id)
-    load_status = Load.statuses[:not_planned]
+  def get_or_create_load_by_driver(delivery_date, delivery_shift, driver_id)
     load = Load.where(:delivery_date => delivery_date, :delivery_shift => delivery_shift).
-        where.not(:status => load_status).
+        where.not(:status => Load.statuses[:not_planned]).
         joins(:truck).where(:trucks => {:driver_id => driver_id}).first
 
     unless load

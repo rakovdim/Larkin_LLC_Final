@@ -14,7 +14,7 @@ class BaseLoadController < ApplicationController
 
   def send_json_response (json_response)
     respond_to do |format|
-      puts json_response
+      #puts json_response
       format.json { render :json => json_response }
     end
   end
