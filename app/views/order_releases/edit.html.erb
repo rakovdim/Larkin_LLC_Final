@@ -10,7 +10,7 @@
         </div>
         <div class="col-sm-6">
           <%= f.label 'Delivery Status' %>
-          <div class="order-value"><%= @order_release.status.humanize %></div>
+          <div id="order_status" class="order-value"><%= @order_release.status.humanize %></div>
         </div>
       </div>
       <div class="row top-buffer-small">
@@ -121,4 +121,9 @@
   <% end %>
 </div>
 
-
+<script>
+  if ($('#order_status').text() != 'Not planned') {
+    alert('Order has already been planned. You cant modify it');
+    $("form").find(":input").prop("disabled", true);
+  }
+</script>
