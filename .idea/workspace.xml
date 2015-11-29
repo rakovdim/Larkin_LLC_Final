@@ -1,15 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="9882b54e-6a91-46fa-9130-e5cf8c2847d3" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/app/views/errors/show.html.erb" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/base_load_controller.rb" afterPath="$PROJECT_DIR$/app/controllers/base_load_controller.rb" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/services/load/load_service.rb" afterPath="$PROJECT_DIR$/app/services/load/load_service.rb" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/services/order_release/order_release_service.rb" afterPath="$PROJECT_DIR$/app/services/order_release/order_release_service.rb" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/loads/index.html.erb" afterPath="$PROJECT_DIR$/app/views/loads/index.html.erb" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/order_releases/index.html.erb" afterPath="$PROJECT_DIR$/app/views/order_releases/index.html.erb" />
-    </list>
+    <list default="true" id="9882b54e-6a91-46fa-9130-e5cf8c2847d3" name="Default" comment="" />
     <ignored path="Larkin_LLC_Final.iws" />
     <ignored path=".idea/workspace.xml" />
     <ignored path=".idea/dataSources.local.xml" />
