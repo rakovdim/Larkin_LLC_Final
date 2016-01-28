@@ -150,5 +150,3 @@ $(document).on "page:change", ->
     addDeliveryDateInput('delivery_date_input').
     addDeliveryOrdersTable('orders_delivery_table').
     adddownloadButton('download_routing_list_button')
-
-

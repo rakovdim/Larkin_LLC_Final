@@ -15,14 +15,6 @@ ActiveRecord::Schema.define(version: 20151122170815) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
-  enable_extension "adminpack"
-
-  create_table "jobs", force: :cascade do |t|
-    t.string   "name"
-    t.integer  "job_type"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
 
   create_table "loads", force: :cascade do |t|
     t.date     "delivery_date"
@@ -69,12 +61,6 @@ ActiveRecord::Schema.define(version: 20151122170815) do
   add_index "order_releases", ["load_id"], name: "index_order_releases_on_load_id", using: :btree
   add_index "order_releases", ["status"], name: "index_order_releases_on_status", using: :btree
 
-  create_table "orders", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.string   "name"
-  end
-
   create_table "trucks", force: :cascade do |t|
     t.string   "name"
     t.integer  "driver_id"
@@ -90,13 +76,6 @@ ActiveRecord::Schema.define(version: 20151122170815) do
     t.datetime "created_at",      null: false
     t.datetime "updated_at",      null: false
     t.string   "user_role"
-  end
-
-  create_table "works", force: :cascade do |t|
-    t.string   "name"
-    t.integer  "type"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
   end
 
   add_foreign_key "loads", "trucks"

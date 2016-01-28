@@ -4,13 +4,13 @@ one:
   delivery_date: 2015-11-12
   delivery_shift: 1
   origin_name: MyString
-  origin_raw_line: MyText
+  origin_raw_line_1: MyText
   origin_city: MyString
   origin_state: MyString
   origin_country: MyString
   origin_zip: 1
   destination_name: MyString
-  destination_raw_line: MyText
+  destination_raw_line_1: MyText
   destination_city: MyString
   destination_state: MyString
   destination_zip: 1
@@ -22,19 +22,18 @@ one:
   handling_unit_quantity: 1
   handling_unit_type: 1
   status: 1
-  type: 1
 
 two:
   delivery_date: 2015-11-12
   delivery_shift: 1
   origin_name: MyString
-  origin_raw_line: MyText
+  origin_raw_line_1: MyText
   origin_city: MyString
   origin_state: MyString
   origin_country: MyString
   origin_zip: 1
   destination_name: MyString
-  destination_raw_line: MyText
+  destination_raw_line_1: MyText
   destination_city: MyString
   destination_state: MyString
   destination_zip: 1
@@ -46,4 +45,3 @@ two:
   handling_unit_quantity: 1
   handling_unit_type: 1
   status: 1
-  type: 1
